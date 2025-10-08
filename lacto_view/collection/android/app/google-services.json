@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "729936702417",
+    "project_id": "lactoview-13e4c",
+    "storage_bucket": "lactoview-13e4c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:729936702417:android:8e1fc1bc6c0b5d68834ef0",
+        "android_client_info": {
+          "package_name": "com.example.lacto_view"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmV-i8jrUknPjaAMHX68u2O2zs6XytvpE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:729936702417:android:244c4711474398e1834ef0",
+        "android_client_info": {
+          "package_name": "com.grupo4.lactoview"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmV-i8jrUknPjaAMHX68u2O2zs6XytvpE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
