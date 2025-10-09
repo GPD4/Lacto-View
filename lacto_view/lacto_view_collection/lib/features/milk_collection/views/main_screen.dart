@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/nav_bar.dart';
 import 'main_screens.dart';
-import 'views.dart';
+import 'views_collection.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
