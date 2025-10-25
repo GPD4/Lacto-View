@@ -14,3 +14,10 @@ build/
 
 # Test related files
 coverage/
+
+# API configs
+lactoview-13e4c-firebase-adminsdk-fbsvc-68e3a9a889
+
+# Credentials Firebase
+credential_firebase/*.json
+

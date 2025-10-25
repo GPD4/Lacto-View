@@ -8,8 +8,12 @@ environment:
 
 dependencies:
   dart_frog: ^1.1.0
+  firebase_admin: ^0.3.1
+  http: ^1.2.0
+  googleapis_auth: 1.6.0
 
 dev_dependencies:
   dart_frog_lint: ^0.1.0
   mocktail: ^1.0.3
   test: ^1.25.5
+  firedart: ^0.9.8
