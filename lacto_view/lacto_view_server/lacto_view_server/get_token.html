@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Gerador Token Firebase</title>
+    </head>
+    <body>
+        <h1>Abra o Console (F12) para ver o token</h1>
+
+        <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+
+        <script>
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyAhobgP6vp9K0ISeM6kWjaNgMjPntaw_Tk",
+                authDomain: "lactoviewv2.firebaseapp.com",
+                projectId: "lactoviewv2",
+                storageBucket: "lactoviewv2.firebasestorage.app",
+                messagingSenderId: "669575528695",
+                appId: "1:669575528695:web:5f003a41395ebb97b1d3f2",
+                measurementId: "G-VSTE864Y9H"
+            };
+
+            const email = "lactoview_teste@gmail.com"
+            const password = "123456"
+
+            firebase.initializeApp(firebaseConfig);
+
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    console.log("Login realizado com êxito!");
+                    return userCredential.user.getIdToken();
+                })
+                .then((token) => {
+                    console.log("%c--- Seu Token JWT (copie) ---", "color: green, font-size: 16px;");
+                    console.log(token);
+                    console.log("%c-------------------------------------", "color: green; font-size: 16px;");
+                })
+                .catch((error) => {
+                    console.error("Falha no Login:", error.message);
+                });
+        </script>
+    </body>
+</html>

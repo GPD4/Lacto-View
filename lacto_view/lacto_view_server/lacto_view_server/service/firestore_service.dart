@@ -23,11 +23,11 @@ class FirestoreService {
       );
     }
 
-    // 📄 Lê o conteúdo do arquivo JSON manualmente
+    //Lê o conteúdo do arquivo JSON manualmente
     final fileContent = File(serviceAccountPath).readAsStringSync();
     final jsonData = jsonDecode(fileContent);
 
-    // ✅ Extrai o project_id do JSON
+    // Extrai o project_id do JSON
     _projectId = jsonData['project_id'] as String?;
     if (_projectId == null) {
       throw Exception('Project ID não encontrado na chave de serviço.');
@@ -41,6 +41,7 @@ class FirestoreService {
     print('✅ FirestoreService inicializado para o projeto: $_projectId');
   }
 
+// metodo GetPersons
   Future<List<Map<String, dynamic>>> getPersons() async {
     await initialize();
 
@@ -64,5 +65,64 @@ class FirestoreService {
         'role': fields['role']?['stringValue'],
       };
     }).toList();
+  }
+
+  Future<String> addDocument(
+      String collectionName, Map<String, dynamic> data) async {
+    await initialize(); //gatantir que esteja autenticado
+
+// Url para criar um documento sem ID
+    final url = Uri.parse(
+      'https://firestore.googleapis.com/v1/projects/$_projectId/databases/(default)/documents/$collectionName',
+    );
+
+    final firestoreBody = {
+      'fields': _mapToFirestoreFields(data),
+    };
+
+// requisição POST com o body formatado
+    final response = await _client!.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(firestoreBody),
+    );
+
+// se API retornar 200 informa o erro:
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Falha ao criar documento no Firestore: ${response.body}');
+    }
+
+    final responseData = jsonDecode(response.body);
+    final documentName = responseData['name'] as String;
+    final documentId = documentName.split('/').last;
+
+    return documentId;
+  }
+
+  // Conversor
+  // Converte um Map Dart (ex: {'name': 'Gui'})
+  // para o formato da API REST (ex: {'name': {'stringValue': 'Gui'}})
+
+  Map<String, dynamic> _mapToFirestoreFields(Map<String, dynamic> map) {
+    final fields = <String, dynamic>{};
+
+    map.forEach((key, value) {
+      if (value is String) {
+        fields[key] = {'stringValue': value};
+      } else if (value is bool) {
+        fields[key] = {'booleanValue': value};
+      } else if (value is int) {
+        fields[key] = {'integerValue': value.toString()};
+      } else if (value is double) {
+        fields[key] = {'integerValue': value.toString()};
+      } else if (value is DateTime) {
+        fields[key] = {'timestampValue': value.toIso8601String()};
+      } else if (value == null) {
+        fields[key] = {'nullValue': null};
+      }
+    });
+
+    return fields;
   }
 }

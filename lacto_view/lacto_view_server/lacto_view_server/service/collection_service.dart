@@ -1,4 +1,4 @@
-import 'package:firedart/firedart.dart';
+import 'package:dart_firebase_admin/firestore.dart';
 import '../model/collection_model.dart';
 import '../model/producer_model.dart';
 import '../service/producer_service.dart';

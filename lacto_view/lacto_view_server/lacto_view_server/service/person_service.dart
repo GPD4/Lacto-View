@@ -1,29 +1,36 @@
-import 'package:firedart/firedart.dart';
+import 'package:dart_firebase_admin/auth.dart';
+import 'package:dart_firebase_admin/firestore.dart';
 import '../model/person_model.dart';
 
 class PersonService {
+  final Auth _auth;
   final Firestore _firestore;
+  late final CollectionReference _personRef;
 
-  PersonService(this._firestore);
+  PersonService(this._firestore, this._auth) {
+    _personRef = _firestore.collection('person');
+  }
 
-  Future<List<Person>> findPersons({String? role}) async {
-    // 1. Lógica de Acesso aos Dados (que antes estava no Repository)
-    final collection = _firestore.collection('person');
-    late QueryReference query;
-    if (role != null && role.isNotEmpty) {
-      if (!['producer', 'collector', 'admin'].contains(role)) {
-        throw Exception('Role inválida!'); // 2. Lógica de Negócio (Validação)
-      }
-      query = collection.where('role', isEqualTo: role);
+  Future<Person> createPerson(String uid, Person person) async {
+    final data = person.toMap();
+    final serverTime = DateTime.now();
+
+    data['created_at'] = serverTime.toIso8601String();
+    data['updated_at'] = serverTime.toIso8601String();
+
+    data.remove('id');
+
+    try {
+      await _personRef.doc(uid).set(data);
+
+      return person.copyWith(
+        id: uid,
+        createdAt: serverTime,
+        updatedAt: serverTime,
+      );
+    } catch (e) {
+      print("Erro ao adicionar Person no DB(FireStore):");
+      rethrow;
     }
-
-    final result = await query.get();
-
-    final personList = <Person>[];
-    for (final doc in result) {
-      final data = doc.map..['id'] = doc.id;
-      personList.add(Person.fromJson(doc.id, doc.map));
-    }
-    return personList;
   }
 }

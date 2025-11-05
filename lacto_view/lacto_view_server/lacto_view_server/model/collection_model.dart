@@ -43,6 +43,40 @@ class MilkCollection {
     this.syncedAt,
   });
 
+// fromMap serve para dados vindos do App Mobile(Novos cadastros)
+
+  factory MilkCollection.fromMap(Map<String, dynamic> map) {
+    return MilkCollection(
+      id: map['id'] as String?,
+      producerId: map['producer_id'] as String,
+      producerPropertyId: map['producer_property_id'] as String,
+      rejectionReason: map['rejection_reason'] as String?,
+      rejection: map['rejection'] as bool,
+      volumeLt: (map['volume_lt'] as num).toDouble(),
+      temperature: (map['temperature'] as num).toDouble(),
+      producerPresent: map['producer_present'] as bool,
+      ph: (map['ph'] as num?)?.toDouble(),
+      numtanque: map['numtanque'] as String,
+      sample: map['sample'] as bool,
+      tubeNumber: map['tube_number'] as String?,
+      observation: map['observation'] as String?,
+      status: map['status'] as String,
+      collectorId: map['collector_id'] as String,
+      analysisId: map['analysis_id'] as int?,
+      createdAt: map['created_at'] != null
+          ? DateTime.parse(map['created_at'] as String)
+          : null,
+      updatedAt: map['updated_at'] != null
+          ? DateTime.parse(map['updated_at'] as String)
+          : null,
+      syncedAt: map['synced_at'] != null
+          ? DateTime.parse(map['synced_at'] as String)
+          : null,
+    );
+  }
+
+// O fromJson serve para dados que vêm do DB(Firebase/Firestore) como Consultas e Relatórios.
+
   factory MilkCollection.fromJson(Map<String, dynamic> json) {
     // AQUI você faria a validação dos dados recebidos!
     // Ex: if ((json['volume_lt'] as num? ?? -1) < 0) throw Exception('Volume inválido');

@@ -1,5 +1,5 @@
 class Person {
-  final String id;
+  final String? id;
   final String name;
   final String cpfCnpj;
   final String role;
@@ -9,7 +9,7 @@ class Person {
   final DateTime? updatedAt;
 
   Person({
-    required this.id,
+    this.id,
     required this.name,
     required this.cpfCnpj,
     required this.role,
@@ -19,9 +19,27 @@ class Person {
     this.updatedAt,
   });
 
+  factory Person.fromMap(Map<String, dynamic> map) {
+    if (map['name'] == null || map['cpf_cnpj'] == null || map['role'] == null) {
+      throw Exception(
+          'Campos essenciais (name, cpf_cnpj, role) estão faltando.');
+    }
+
+    final now = DateTime.now();
+
+    return Person(
+      name: map['name'] as String,
+      cpfCnpj: map['cpf_cnpj'] as String,
+      role: map['role'] as String,
+      profileImg: map['profile_img'] as String? ?? '',
+      isActive: map['is_active'] as bool? ?? true,
+      createdAt: now,
+      updatedAt: now,
+    );
+  }
+
   factory Person.fromJson(String docId, Map<String, dynamic> json) {
     //Validaçao dos dados recebidos
-    // Ex: if ((json['volume_lt'] as num? ?? -1) < 0) throw Exception('Volume inválido');
     if (json['name'] == null ||
         json['cpf_cnpj'] == null ||
         json['role'] == null) {
@@ -55,5 +73,27 @@ class Person {
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
+  }
+
+  Person copyWith({
+    String? id,
+    String? name,
+    String? cpfCnpj,
+    String? role,
+    String? profileImg,
+    bool? isActive,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Person(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      cpfCnpj: cpfCnpj ?? this.cpfCnpj,
+      role: role ?? this.role,
+      profileImg: profileImg ?? this.profileImg,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }

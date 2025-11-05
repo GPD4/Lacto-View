@@ -1,0 +1,58 @@
+/* 
+  --- Lembrar de ---
+
+  --- configurar variável de ambiente >
+
+  Ruindows(windows - Powershell) >>>
+
+  $env:GOOGLE_APPLICATION_CREDENTIALS="C:/Users/User/Desktop/lacto-view-github/LactoView_Mobile/lacto_view_server/lacto_view_server/routes-controller"
+  dart_frog dev
+
+  Linux / Mac >>>
+
+  export GOOGLE_APPLICATION_CREDENTIALS="/home/matheus/Desktop/lacto-view-github/LactoView_Mobile/lacto_view_server/lacto_view_server/routes-controller"
+  dart_frog dev
+
+*/
+
+import 'dart:io';
+import 'dart:convert';
+
+import 'package:dart_frog/dart_frog.dart';
+import 'package:firebase_admin/firebase_admin.dart';
+
+// Serviços
+import '../service/firestore_service.dart';
+import '../service/person_service.dart';
+import '../service/collection_service.dart';
+
+App? _firebaseApp;
+
+Future<App> _initializeFirebase() async {
+  if (_firebaseApp != null) return _firebaseApp!;
+
+  try {
+    _firebaseApp = FirebaseAdmin.instance.initializeApp();
+    print('--- Firebase Admin SDK Conectado e Autenticado com Êxito! ---');
+    return _firebaseApp!;
+  } catch (e) {
+    print('!!! Erro ao Inicializar o Firebase: $e');
+    print(
+        'Verifique se a variável de ambiente GOOGLE_APPLICATION_CREDENTIALS está correta.');
+    rethrow;
+  }
+}
+
+Handler middleware(Handler handler) {
+  return (context) async {
+    final app = await _initializeFirebase();
+    final auth = app.auth();
+
+    // Usar o singleton do FirestoreService
+    final firestoreService = FirestoreService();
+
+    return handler
+        .use(provider<Auth>((_) => auth))
+        .use(provider<FirestoreService>((_) => firestoreService))(context);
+  };
+}
