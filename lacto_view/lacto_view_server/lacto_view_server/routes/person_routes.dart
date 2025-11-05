@@ -28,6 +28,7 @@ Future<Response> onRequest(RequestContext context) async {
     // Pega o UID de dentro do token verificado
     uid = decodedToken.uid;
   } catch (e) {
+    print('!!!!!!!!!!!!!! ERRO REAL DA VERIFICAÇÃO: $e');
     return Response(statusCode: 401, body: 'Não autorizado: Token inválido');
   }
 
@@ -42,7 +43,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     return Response.json(
       body: newPerson.toMap(),
-      statusCode: HttpStatus.created, //Codigo: 201
+      statusCode: HttpStatus.created, //Code: 201
     );
   } catch (e) {
     return Response.json(body: {'error': e.toString()}, statusCode: 400);

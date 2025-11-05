@@ -6,19 +6,18 @@
     <body>
         <h1>Abra o Console (F12) para ver o token</h1>
 
-        <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"> </script>
+        <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"> </script>
 
         <script>
 
             const firebaseConfig = {
-                apiKey: "AIzaSyAhobgP6vp9K0ISeM6kWjaNgMjPntaw_Tk",
-                authDomain: "lactoviewv2.firebaseapp.com",
-                projectId: "lactoviewv2",
-                storageBucket: "lactoviewv2.firebasestorage.app",
-                messagingSenderId: "669575528695",
-                appId: "1:669575528695:web:5f003a41395ebb97b1d3f2",
-                measurementId: "G-VSTE864Y9H"
+                apiKey: "AIzaSyDmAoX1tjLIllIuaO7wGdyIhjV8gpLCTNk",
+                authDomain: "lactoview4.firebaseapp.com",
+                projectId: "lactoview4",
+                storageBucket: "lactoview4.firebasestorage.app",
+                messagingSenderId: "386045070193",
+                appId: "1:386045070193:web:92ed68e837498f509a04d0"
             };
 
             const email = "lactoview_teste@gmail.com"
@@ -32,12 +31,12 @@
                     return userCredential.user.getIdToken();
                 })
                 .then((token) => {
-                    console.log("%c--- Seu Token JWT (copie) ---", "color: green, font-size: 16px;");
+                    console.log("%c--- Seu Token JWT (copie) ---", "color: green; font-size: 16px;");
                     console.log(token);
                     console.log("%c-------------------------------------", "color: green; font-size: 16px;");
                 })
                 .catch((error) => {
-                    console.error("Falha no Login:", error.message);
+                    console.erro("Falha no Login:", error.message);
                 });
         </script>
     </body>
