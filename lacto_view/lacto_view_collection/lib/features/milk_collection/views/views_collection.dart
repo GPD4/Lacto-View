@@ -77,11 +77,7 @@ class _MilkCollectionFormViewState extends State<MilkCollectionFormView> {
       final newCollection = MilkCollection(
         id: DateTime.now().millisecondsSinceEpoch,
         producerId: _selectedProducer!.id,
-        producerFirstName: _selectedProducer!.name.split(' ').first,
-        producerLastName: _selectedProducer!.name
-            .split(' ')
-            .sublist(1)
-            .join(' '),
+        producerName: _selectedProducer!.name.split(' ').sublist(1).join(' '),
         producerPropertyId: 404,
         propertyName: _selectedProducer!.propertyName,
         rejection: _isRejectionMode,

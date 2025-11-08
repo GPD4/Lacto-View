@@ -1,8 +1,7 @@
 class MilkCollection {
   final int id;
   final int producerId;
-  final String producerFirstName;
-  final String producerLastName;
+  final String producerName;
   final int producerPropertyId;
   final String propertyName;
   final String rejectionReason;
@@ -24,8 +23,7 @@ class MilkCollection {
   MilkCollection({
     required this.id,
     required this.producerId,
-    required this.producerFirstName,
-    required this.producerLastName,
+    required this.producerName,
     required this.producerPropertyId,
     required this.propertyName,
     required this.rejectionReason,
@@ -50,8 +48,7 @@ class MilkCollection {
     return MilkCollection(
       id: json['id'],
       producerId: json['producer_id'],
-      producerFirstName: json['producer_first_name'],
-      producerLastName: json['producer_last_name'],
+      producerName: json['producer_name'],
       producerPropertyId: json['producer_property_id'],
       propertyName: json['property_name'],
       rejectionReason: json['rejection_reason'],
@@ -78,8 +75,7 @@ class MilkCollection {
       'id': id,
       'producer_id': producerId,
       'producer_property_id': producerPropertyId,
-      'producer_first_name': producerFirstName, // CORRIGIDO: Padronizado
-      'producer_last_name': producerLastName, // CORRIGIDO: Padronizado
+      'producer_name': producerName, // CORRIGIDO: Padronizado
       'property_name': propertyName, // CORRIGIDO: Padronizado
       'rejection_reason': rejectionReason,
       'rejection': rejection,

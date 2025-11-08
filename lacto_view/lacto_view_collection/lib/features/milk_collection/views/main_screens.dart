@@ -1,6 +1,7 @@
 // lib/views/main_screens.dart
 
 import 'package:flutter/material.dart';
+import '../views/form_person_view.dart';
 
 // Tela de Início (Home)
 class HomeScreen extends StatelessWidget {
@@ -52,10 +53,10 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
-      body: const Center(
-        child: Text('Conteúdo do Perfil', style: TextStyle(fontSize: 24)),
-      ),
+      appBar: AppBar(title: const Text('Cadastro de Usuário')),
+
+      // 2. SUBSTITUA O BODY PELO SEU WIDGET DE FORMULÁRIO
+      body: FormPersonView(),
     );
   }
 }
