@@ -5,6 +5,7 @@ class Person {
   final String? cadpro;
   final String? email;
   final String telefone;
+  final String password;
   final String role;
   final String profileImg;
   final bool isActive;
@@ -18,6 +19,7 @@ class Person {
     required this.cadpro,
     required this.email,
     required this.telefone,
+    required this.password,
     required this.role,
     required this.profileImg,
     required this.isActive,
@@ -33,6 +35,7 @@ class Person {
       cadpro: json['cadpro'],
       email: json['email'],
       telefone: json['telefone'],
+      password: json['password'],
       role: json['role'],
       profileImg: json['profile_img'],
       isActive: json['is_active'],
@@ -49,6 +52,7 @@ class Person {
       'cadpro': cadpro,
       'email': email,
       'telefone': telefone,
+      'password': password,
       'role': role,
       'profile_img': profileImg,
       'is_active': isActive,

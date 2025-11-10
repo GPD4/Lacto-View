@@ -2,6 +2,8 @@ class Person {
   final String? id;
   final String name;
   final String cpfCnpj;
+  final String? email;
+  final String phone;
   final String role;
   final String profileImg;
   final bool isActive;
@@ -12,6 +14,8 @@ class Person {
     this.id,
     required this.name,
     required this.cpfCnpj,
+    required this.email,
+    required this.phone,
     required this.role,
     required this.profileImg,
     required this.isActive,
@@ -30,6 +34,8 @@ class Person {
     return Person(
       name: map['name'] as String,
       cpfCnpj: map['cpf_cnpj'] as String,
+      email: map['email'] as String,
+      phone: map['phone'] as String,
       role: map['role'] as String,
       profileImg: map['profile_img'] as String? ?? '',
       isActive: map['is_active'] as bool? ?? true,
@@ -38,7 +44,7 @@ class Person {
     );
   }
 
-  factory Person.fromJson(String docId, Map<String, dynamic> json) {
+  factory Person.fromJson(String docId, Map<String, Object?> json) {
     //Validaçao dos dados recebidos
     if (json['name'] == null ||
         json['cpf_cnpj'] == null ||
@@ -50,6 +56,8 @@ class Person {
       id: docId,
       name: json['name'] as String,
       cpfCnpj: json['cpf_cnpj'] as String,
+      email: json['email'] as String,
+      phone: json['phone'] as String,
       role: json['role'] as String,
       profileImg: json['profile_img'] as String,
       isActive: json['is_active'] as bool,
@@ -62,11 +70,13 @@ class Person {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, Object?> toMap() {
     return {
       'id': id,
       'name': name,
       'cpf_cnpj': cpfCnpj,
+      'email': email,
+      'phone': phone,
       'role': role,
       'profile_img': profileImg,
       'is_active': isActive,
@@ -79,6 +89,8 @@ class Person {
     String? id,
     String? name,
     String? cpfCnpj,
+    String? email,
+    String? phone,
     String? role,
     String? profileImg,
     bool? isActive,
@@ -89,6 +101,8 @@ class Person {
       id: id ?? this.id,
       name: name ?? this.name,
       cpfCnpj: cpfCnpj ?? this.cpfCnpj,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
       role: role ?? this.role,
       profileImg: profileImg ?? this.profileImg,
       isActive: isActive ?? this.isActive,

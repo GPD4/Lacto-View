@@ -9,8 +9,8 @@ import 'firebase_options.dart';
 
 // --- Imports do Módulo Person (NOVOS) ---
 // (Ajuste os caminhos se você os colocou em outra pasta)
-import 'features/milk_collection/service/service_person.dart';
-import 'features/milk_collection/view_models/view_models_person.dart';
+import 'features/profile/service/service_person.dart';
+import 'features/profile/view_model/view_models_person.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

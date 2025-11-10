@@ -27,6 +27,7 @@ class PersonViewModel extends ChangeNotifier {
     required String cadpro,
     required String email,
     required String telefone,
+    required String password,
     required String role,
     required bool isActive,
   }) async {
@@ -43,6 +44,7 @@ class PersonViewModel extends ChangeNotifier {
       email: email,
       cadpro: cadpro,
       telefone: telefone,
+      password: password,
       role: role,
       isActive: isActive,
       profileImg: "assets/images/default_profile.png", // Valor padrão

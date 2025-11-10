@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // Importe seu ViewModel
-import '../view_models/view_models_person.dart';
+import '../view_model/view_models_person.dart';
 
 class FormPersonView extends StatefulWidget {
   @override
@@ -21,6 +21,7 @@ class _FormPersonViewState extends State<FormPersonView> {
   final _cadproController = TextEditingController();
   final _emailController = TextEditingController();
   final _telefoneController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -29,6 +30,7 @@ class _FormPersonViewState extends State<FormPersonView> {
     _cadproController.dispose();
     _emailController.dispose();
     _telefoneController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -46,6 +48,7 @@ class _FormPersonViewState extends State<FormPersonView> {
       cadpro: _cadproController.text,
       email: _emailController.text,
       telefone: _telefoneController.text,
+      password: _passwordController.text,
       role: _selectedRole!,
       isActive: _isActive,
     );
@@ -61,6 +64,7 @@ class _FormPersonViewState extends State<FormPersonView> {
         _cpfCnpjController.clear();
         _emailController.clear();
         _telefoneController.clear();
+        _passwordController.clear();
         setState(() {
           _selectedRole = null;
           _isActive = false;
@@ -188,6 +192,18 @@ class _FormPersonViewState extends State<FormPersonView> {
                     decoration: InputDecoration(
                       labelText: "Telefone",
                       prefixIcon: Icon(Icons.phone),
+                    ),
+                    validator: (value) => (value == null || value.isEmpty)
+                        ? 'Campo obrigatório'
+                        : null,
+                  ),
+                  SizedBox(height: 16),
+                  // --- 8 CAMPO Senha ---
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      labelText: "Senha",
+                      prefixIcon: Icon(Icons.lock),
                     ),
                     validator: (value) => (value == null || value.isEmpty)
                         ? 'Campo obrigatório'

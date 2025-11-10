@@ -9,6 +9,7 @@ publish_to: none
 dependencies:
   dart_frog: ^1.0.0
   dart_firebase_admin: ^0.4.1
+  crypto: ^3.0.3
 
 dev_dependencies:
   dart_frog_lint: ^0.1.0

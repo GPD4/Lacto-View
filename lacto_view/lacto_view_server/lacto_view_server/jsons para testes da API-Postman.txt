@@ -1,0 +1,25 @@
+Cadastrar usuário - 
+
+{
+    "name": "João Produtor",
+    "cpf_cnpj": "11122233344",
+    "email": "joao.produtor@lactoview.com",
+    "phone": "45999887766",
+    "role": "producer",
+    "password": "senhaForte123!",
+    "is_active": true,
+    "profile_img": "http://example.com/images/joao.png"
+}
+
+Cadastrar Propriedade - 
+
+{
+    "name": "Fazenda Santa Rosa",
+    "cep": "85901170",
+    "city": "Toledo",
+    "state": "Parana",
+    "street": "rua do embaço",
+    "is_active": true,
+    "tanks_qtd": "2"
+}
+
