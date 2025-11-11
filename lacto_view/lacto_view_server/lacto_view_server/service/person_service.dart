@@ -13,16 +13,22 @@ class PersonService {
   late final CollectionReference<Map<String, dynamic>> _userRef;
   late final CollectionReference<Map<String, dynamic>> _producerRef;
   late final CollectionReference<Map<String, dynamic>> _collectorRef;
+  late final CollectionReference<Map<String, dynamic>> _producerPropertyRef;
 
   PersonService(this._firestore, this._auth) {
     _personRef = _firestore.collection('person');
     _userRef = _firestore.collection('user');
     _producerRef = _firestore.collection('producer');
     _collectorRef = _firestore.collection('collector');
+    _producerPropertyRef = _firestore.collection('producer_property');
   }
 
   Future<Person> createPerson(
-      Person person, String password, String? cadpro) async {
+    Person person,
+    String password,
+    String? cadpro,
+    String? propertyId,
+  ) async {
     final loginKeys = [person.cpfCnpj, person.email, person.phone];
 
     final existingUser = await _userRef
@@ -37,6 +43,11 @@ class PersonService {
 // Trata o campo Cadpro
     if (person.role == 'producer' && (cadpro == null || cadpro.isEmpty)) {
       throw Exception('Role = "producer", mas o "cadpro" está ausente');
+    }
+
+    if (person.role == 'producer' &&
+        (propertyId == null || propertyId.isEmpty)) {
+      throw Exception('Role = "producer", mas o "propertyId" está ausente');
     }
 
     //criptografar a senha(hashing)
@@ -62,7 +73,7 @@ class PersonService {
       final userData = {
         'person_id': newPersonId,
         'login_keys': loginKeys,
-        'password': hashedPassword, //Salva a HASH, não a senha crua
+        'password': hashedPassword, //Salva a HASH
       };
 
       await _firestore.runTransaction((transaction) async {
@@ -72,6 +83,7 @@ class PersonService {
         transaction.set(newUserRef, userData);
         //Cria o Producer
         if (person.role == 'producer' && cadpro != null) {
+          print('>>> DEBUG: Bloco Producer está executando.');
           final newProducerRef = _producerRef.doc(newPersonId);
 
           final producerData = {
@@ -81,6 +93,25 @@ class PersonService {
             'updated_at': now,
           };
           transaction.set(newProducerRef, producerData);
+        }
+
+        //Vinculo de Producer e Property = producer_property
+
+        if (propertyId != null) {
+          print('>>> DEBUG: Bloco producer_property está executando.');
+          print(
+              '>>> DEBUG: Linkando Person $newPersonId com Property $propertyId');
+          //Cria ID composto "person_id + property_id = producer_property_id"
+          final linkId = '${newPersonId}_$propertyId';
+          final newLinkRef = _producerPropertyRef.doc(linkId);
+
+          final linkData = {
+            'person_id': newPersonId,
+            'property_id': propertyId,
+            'created_at': now,
+            'updated_at': now,
+          };
+          transaction.set(newLinkRef, linkData);
         }
       });
 
@@ -95,11 +126,15 @@ class PersonService {
     }
   }
 
-  //Future<Person> editPerson(String uid, Person person) async {}
-
-  //Future<Person> deletePerson(String uid, Person person) async {}
+  //Future<Person> getAll(String uid, Person person) async {}
 
   //Future<Person> searchByNameOrCpfCnpj(String uid, Person person) async {}
 
+  //Future<Person> searchByPropertyName(String uid, Person person) async {}
+
   //Future<Person> filterByRole(String uid, Person person) async {}
+
+  //Future<Person> editPerson(String uid, Person person) async {}
+
+  //Future<Person> deletePerson(String uid, Person person) async {}
 }

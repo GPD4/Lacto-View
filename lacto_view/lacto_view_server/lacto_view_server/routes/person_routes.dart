@@ -18,15 +18,13 @@ Future<Response> onRequest(RequestContext context) async {
   String? uid;
 
   try {
-    //Pega o Token do header 'Authorization: Bearer <token>'
     final header = context.request.headers['Authorization'];
     if (header == null) {
       return Response(statusCode: 401, body: 'Não autorizado: Token ausente');
     }
-    // Verifica o token com o Firebase Auth
     final token = header.replaceFirst('Bearer ', '');
     final decodedToken = await auth.verifyIdToken(token);
-    // Pega o UID de dentro do token verificado
+
     uid = decodedToken.uid;
   } catch (e) {
     print('!!!!!!!!!!!!!! ERRO REAL DA VERIFICAÇÃO: $e');
@@ -34,14 +32,14 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   try {
-    // Lê o JSON como Map<String, dynamic>
     final requestBody = await context.request.json();
     final data = requestBody as Map<String, dynamic>;
 
-    // 2.1 Pega a senha e *remove* ela do mapa
     final password = data.remove('password') as String?;
 
     final cadpro = data.remove('cadpro') as String?;
+
+    final propertyId = data.remove('property') as String?;
 
     if (password == null || password.isEmpty) {
       return Response.json(
@@ -50,18 +48,17 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    // 2.2 Cria o objeto Person (usando o fromMap corrigido)
     final person = Person.fromMap(data);
 
-    // 2.3 Chama o *NOVO* método do serviço
-    // Este método criará 'Person' e 'User' na transação
+    //Criará 'Person' e 'User' na transação
     final newPerson = await personService.createPerson(
       person,
       password,
       cadpro,
+      propertyId,
     );
 
-    // 2.4 Retorna o usuário recém-criado
+    //Retorna o usuário recém-criado
     return Response.json(
       body: newPerson.toMap(),
       statusCode: HttpStatus.created, //Code: 201

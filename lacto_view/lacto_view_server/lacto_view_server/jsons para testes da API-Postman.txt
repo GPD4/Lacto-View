@@ -1,11 +1,39 @@
 Cadastrar usuário - 
 
+    {
+        "name": "João Produtor",
+        "cpf_cnpj": "11122233344",
+        "email": "joao.produtor@lactoview.com",
+        "phone": "45999887766",
+        "role": "admin",
+        "password": "senhaForte123!",
+        "is_active": true,
+        "profile_img": "http://example.com/images/joao.png"
+    }
+
+    Collector - 
+
+    {
+        "name": "João Produtor",
+        "cpf_cnpj": "11122233344",
+        "email": "joao.produtor@lactoview.com",
+        "phone": "45999887766",
+        "role": "collector",
+        "password": "senhaForte123!",
+        "is_active": true,
+        "profile_img": "http://example.com/images/joao.png"
+    }
+
+    Producer - 
+
 {
-    "name": "João Produtor",
-    "cpf_cnpj": "11122233344",
-    "email": "joao.produtor@lactoview.com",
-    "phone": "45999887766",
+    "name": "{{$randomFullName}}",
+    "cpf_cnpj": "{{cpf}}",
+    "email": "{{$randomEmail}}",
+    "phone": "{{phoneBR}}",
     "role": "producer",
+    "property": "JT8p2EmfFXhKwamVfyBu",
+    "cadpro": "123256ab",
     "password": "senhaForte123!",
     "is_active": true,
     "profile_img": "http://example.com/images/joao.png"
@@ -20,6 +48,13 @@ Cadastrar Propriedade -
     "state": "Parana",
     "street": "rua do embaço",
     "is_active": true,
-    "tanks_qtd": "2"
+    "tanks_qtd": 2
+}
+
+Cadastrar Coleta - 
+
+{
+    'producer_id': 'V0ouW54aWgeDHFCUlbmo'
+
 }
 

@@ -16,6 +16,7 @@ class _FormPersonViewState extends State<FormPersonView> {
   final List<String> _roles = ['admin', 'coletor', 'produtor'];
   bool _isActive = false;
 
+  final _searchPropertyController = TextEditingController();
   final _nameController = TextEditingController();
   final _cpfCnpjController = TextEditingController();
   final _cadproController = TextEditingController();
@@ -25,6 +26,7 @@ class _FormPersonViewState extends State<FormPersonView> {
 
   @override
   void dispose() {
+    _searchPropertyController.dispose();
     _nameController.dispose();
     _cpfCnpjController.dispose();
     _cadproController.dispose();
@@ -122,103 +124,107 @@ class _FormPersonViewState extends State<FormPersonView> {
                     }).toList(),
                   ),
                   SizedBox(height: 20),
-                  // --- 2 BOTÃO ATIVAR/DESATIVAR (SWITCH) ---
-                  Container(
-                    //scódigo Switch aqui
-                    child: Switch(
-                      value: _isActive,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _isActive = value;
-                        });
-                      },
-                      // ...
+                  if (_selectedRole != null) ...[
+                    // --- 2 BOTÃO ATIVAR/DESATIVAR (SWITCH) ---
+                    Container(
+                      //scódigo Switch aqui
+                      child: Switch(
+                        value: _isActive,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _isActive = value;
+                          });
+                        },
+                        // ...
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  Divider(),
-                  SizedBox(height: 20),
-                  // --- 3 CAMPO NOME COMPLETO ---
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: "Nome Completo",
-                      prefixIcon: Icon(Icons.person),
+                    SizedBox(height: 20),
+                    Divider(),
+                    SizedBox(height: 20),
+                    // --- 3 CAMPO NOME COMPLETO ---
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: "Nome Completo",
+                        prefixIcon: Icon(Icons.person),
+                      ),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Campo obrigatório'
+                          : null,
                     ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Campo obrigatório'
-                        : null,
-                  ),
-                  SizedBox(height: 16),
-                  // --- 4 CAMPO CPF/CNPJ ---
-                  TextFormField(
-                    controller: _cpfCnpjController,
-                    decoration: InputDecoration(
-                      labelText: "CPF/CNPJ",
-                      prefixIcon: Icon(Icons.badge),
+                    SizedBox(height: 16),
+                    // --- 4 CAMPO CPF/CNPJ ---
+                    TextFormField(
+                      controller: _cpfCnpjController,
+                      decoration: InputDecoration(
+                        labelText: "CPF/CNPJ",
+                        prefixIcon: Icon(Icons.badge),
+                      ),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Campo obrigatório'
+                          : null,
                     ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Campo obrigatório'
-                        : null,
-                  ),
-                  SizedBox(height: 16),
-                  // ---5 CAMPO CadPro ---
-                  TextFormField(
-                    controller: _cadproController,
-                    decoration: InputDecoration(
-                      labelText: "Cadpro",
-                      prefixIcon: Icon(Icons.assignment_ind),
+                    SizedBox(height: 16),
+                    if (_selectedRole == 'produtor') ...[
+                      // ---5 CAMPO CadPro ---
+                      TextFormField(
+                        controller: _cadproController,
+                        decoration: InputDecoration(
+                          labelText: "Cadpro",
+                          prefixIcon: Icon(Icons.assignment_ind),
+                        ),
+                        validator: (value) => (value == null || value.isEmpty)
+                            ? 'Campo obrigatório'
+                            : null,
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                    // --- 6 CAMPO Email ---
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: "Email",
+                        prefixIcon: Icon(Icons.email),
+                      ),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Campo obrigatório'
+                          : null,
                     ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Campo obrigatório'
-                        : null,
-                  ),
-                  SizedBox(height: 16),
-                  // --- 6 CAMPO Email ---
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      prefixIcon: Icon(Icons.email),
+                    SizedBox(height: 16),
+                    // --- 7 CAMPO Telefone ---
+                    TextFormField(
+                      controller: _telefoneController,
+                      decoration: InputDecoration(
+                        labelText: "Telefone",
+                        prefixIcon: Icon(Icons.phone),
+                      ),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Campo obrigatório'
+                          : null,
                     ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Campo obrigatório'
-                        : null,
-                  ),
-                  SizedBox(height: 16),
-                  // --- 7 CAMPO Telefone ---
-                  TextFormField(
-                    controller: _telefoneController,
-                    decoration: InputDecoration(
-                      labelText: "Telefone",
-                      prefixIcon: Icon(Icons.phone),
+                    SizedBox(height: 16),
+                    // --- 8 CAMPO Senha ---
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: "Senha",
+                        prefixIcon: Icon(Icons.lock),
+                      ),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Campo obrigatório'
+                          : null,
                     ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Campo obrigatório'
-                        : null,
-                  ),
-                  SizedBox(height: 16),
-                  // --- 8 CAMPO Senha ---
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: "Senha",
-                      prefixIcon: Icon(Icons.lock),
+                    SizedBox(height: 30),
+                    // --- BOTÃO DE SUBMISSÃO ---
+                    ElevatedButton(
+                      // Desabilita o botão enquanto carrega
+                      onPressed: isLoading ? null : _submitForm,
+                      child: Text("CADASTRAR", style: TextStyle(fontSize: 16)),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
                     ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Campo obrigatório'
-                        : null,
-                  ),
-                  SizedBox(height: 30),
-                  // --- BOTÃO DE SUBMISSÃO ---
-                  ElevatedButton(
-                    // Desabilita o botão enquanto carrega
-                    onPressed: isLoading ? null : _submitForm,
-                    child: Text("CADASTRAR", style: TextStyle(fontSize: 16)),
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                    ),
-                  ),
+                  ],
                 ],
               ),
               // --- 5 INDICADOR DE LOADING ---

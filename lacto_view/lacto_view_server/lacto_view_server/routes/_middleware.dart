@@ -9,9 +9,11 @@ import 'package:dart_firebase_admin/auth.dart';
 import 'package:dart_firebase_admin/firestore.dart';
 
 // Serviços
+import '../model/property_model.dart';
 import '../service/person_service.dart';
 import '../service/collection_service.dart';
 import '../service/producer_service.dart';
+import '../service/property_service.dart';
 
 FirebaseAdminApp? _firebaseApp;
 
@@ -20,7 +22,7 @@ Future<FirebaseAdminApp> _initializeFirebase() async {
 
   const String serviceAccountPath =
       //Caminho do arquivo de serviço Firebase >>>>
-      r'C:\Users\User\Desktop\GITHUB LACTOVIEW\LactoView_Mobile\lacto_view_server\lacto_view_server\lactoview4-c8c865e3ea92.json';
+      r'C:\Users\User\Desktop\lactoview-private\LactoView_Mobile\lacto_view_server\lacto_view_server\lactoview4-firebase-adminsdk-fbsvc-182881e85c.json';
 
   try {
     final file = File(serviceAccountPath);
@@ -56,6 +58,12 @@ Handler middleware(Handler handler) {
         .use(provider<Firestore>((_) => firestore))
         .use(provider<PersonService>(
           (_) => PersonService(firestore, auth),
+        ))
+        .use(provider<PropertyService>(
+          (_) => PropertyService(firestore, auth),
+        ))
+        .use(provider<CollectionService>(
+          (_) => CollectionService(firestore),
         ))(context);
   };
 }
