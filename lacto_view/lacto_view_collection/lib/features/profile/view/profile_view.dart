@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 // 1. IMPORT O SEU FORMULÁRIO REAL
 import '../../profile/view/form_person_view.dart';
 import '../../profile/view/form_property_view.dart';
 
 // 2. IMPORTE SEU NOVO WIDGET DE BOTÃO
 import '../../profile/view_model/menu_profile_button.dart'; // <-- Ajuste o caminho se necessário
+
+// 3. IMPORTE O AUTH VIEW MODEL
+import '../../auth/view_model/auth_view_model.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -63,9 +67,10 @@ class ProfileScreen extends StatelessWidget {
             ArrowMenuButton(
               text: 'Sair - Logoff',
               onPressed: () {
-                /*Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => FormPropertyView()),
-                );*/
+                // Importar o AuthViewModel
+                final authViewModel = context.read<AuthViewModel>();
+                authViewModel.logout();
+                Navigator.of(context).pushReplacementNamed('/login');
               },
             ),
           ],
