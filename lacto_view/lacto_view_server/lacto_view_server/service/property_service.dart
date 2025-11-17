@@ -18,13 +18,27 @@ class PropertyService {
     data['created_at'] = serverTime.toIso8601String();
     data['updated_at'] = serverTime.toIso8601String();
 
+    data['owner_uid'] = uid;
+
+    final name = data['name'];
+
+    if (name is String) {
+      data['name_uppercase'] = name.toUpperCase();
+    }
+
+    final city = data['city'];
+
+    if (city is String) {
+      data['city_uppercase'] = city.toUpperCase();
+    }
+
     data.remove('id');
 
     try {
-      await _propertyRef.doc(uid).set(data);
+      final docRef = await _propertyRef.add(data);
 
       return property.copyWith(
-        id: uid,
+        id: docRef.id,
         createdAt: serverTime,
         updatedAt: serverTime,
       );
@@ -34,23 +48,37 @@ class PropertyService {
     }
   }
 
-  Future<List<Property>> searchByNameOrCity(String search) async {
+  Future<List<Property>> searchByNameOrCity(
+    String search, {
+    int limit = 5, //Limite de objetos da consulta. ***OTIMIZAÇÃO***
+  }) async {
+    print('--- DEBUG: Iniciando a busca de Propriedades ---');
+    print('--- Termo de busca recebido: "$search"');
+
     final propertyCollection = _firestore.collection('property');
 
     final String key = search.toUpperCase();
 
-//  Busca por nome da propriedade
+    print('--- Chave normalizada para busca: "$key"');
+
+//Busca por nome
     final nameQuery = await propertyCollection
         .where('name_uppercase', WhereFilter.greaterThanOrEqual, key)
         .where('name_uppercase', WhereFilter.lessThan, key + 'Z')
+        .limit(limit) //Limita o resultado da Query em 5 objetos
         .get();
 
-//  Busca por Cidade da propriedade
+    print('--- Resultados encontrados (NOME): ${nameQuery.docs.length}');
+
+//Busca por Cidade
 
     final cityQuery = await propertyCollection
         .where('city_uppercase', WhereFilter.greaterThanOrEqual, key)
         .where('city_uppercase', WhereFilter.lessThan, key + 'Z')
+        .limit(limit) //Limita o resultado da Query em 5 objetos
         .get();
+
+    print('--- Resultados encontrados (CIDADE): ${cityQuery.docs.length}');
 
     final map = <String, Property>{};
 
@@ -62,6 +90,12 @@ class PropertyService {
       map[doc.id] = Property.fromJson(doc.id, doc.data());
     }
 
-    return map.values.toList();
+    final combinedList = map.values.toList();
+    final total = map.values.toList().length;
+
+    print('--- Total de resultados únicos combinados: $total');
+    print('--- Fim da busca ---');
+
+    return combinedList.take(limit).toList();
   }
 }

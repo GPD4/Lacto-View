@@ -22,7 +22,7 @@ Future<FirebaseAdminApp> _initializeFirebase() async {
 
   const String serviceAccountPath =
       //Caminho do arquivo de serviço Firebase >>>>
-      r'C:\Users\User\Desktop\lactoview-private\LactoView_Mobile\lacto_view_server\lacto_view_server\lactoview4-firebase-adminsdk-fbsvc-182881e85c.json';
+      r'C:\Users\User\Desktop\lacto-view-private\LactoView_Mobile\lacto_view_server\lacto_view_server\lactoview4-firebase-adminsdk-fbsvc-182881e85c.json';
 
   try {
     final file = File(serviceAccountPath);
@@ -53,7 +53,7 @@ Handler middleware(Handler handler) {
     final auth = Auth(app);
     final firestore = Firestore(app);
 
-    return handler
+    final diHandler = handler
         .use(provider<Auth>((_) => auth))
         .use(provider<Firestore>((_) => firestore))
         .use(provider<PersonService>(
@@ -64,6 +64,17 @@ Handler middleware(Handler handler) {
         ))
         .use(provider<CollectionService>(
           (_) => CollectionService(firestore),
-        ))(context);
+        ));
+
+    final response = await diHandler(context);
+
+    return response.copyWith(
+      headers: {
+        ...response.headers,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
+        'Access-Control-Allow-Headers': 'Origin, Content-Type',
+      },
+    );
   };
 }

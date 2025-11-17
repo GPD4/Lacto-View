@@ -51,10 +51,29 @@ Cadastrar Propriedade -
     "tanks_qtd": 2
 }
 
+{
+    "name": "{{$randomFullName}}",
+    "cep": "85901170",
+    "city": "Toledo",
+    "state": "Parana",
+    "street": "rua do embaço",
+    "is_active": true,
+    "tanks_qtd": 2
+}
+
+Get para propriedades:
+
+http://localhost:8080/property/search?q=TOLEDO
+
+Troque 'TOLEDO' por outra key desejada, a qual irá comparar com os campos 'name' e 'city'.
+
+
 Cadastrar Coleta - 
 
 {
     'producer_id': 'V0ouW54aWgeDHFCUlbmo'
 
 }
+
+
 

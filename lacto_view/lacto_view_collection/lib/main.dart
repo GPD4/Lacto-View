@@ -2,15 +2,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// --- Imports do Módulo Collection (Existentes) ---
 import 'features/milk_collection/view_models/view_models_collection.dart';
 import 'features/milk_collection/views/main_screen.dart';
 import 'firebase_options.dart';
 
-// --- Imports do Módulo Person (NOVOS) ---
-// (Ajuste os caminhos se você os colocou em outra pasta)
 import 'features/profile/service/service_person.dart';
+import 'features/profile/service/service_property_search.dart';
 import 'features/profile/view_model/view_models_person.dart';
+import 'features/profile/view_model/view_model_property.dart';
+import 'features/profile/view_model/search_property_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,29 +23,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Substitua o 'ChangeNotifierProvider' por 'MultiProvider'
     return MultiProvider(
       providers: [
-        // --- Seu Provider Existente (Coleta de Leite) ---
         ChangeNotifierProvider(create: (context) => MilkCollectionViewModel()),
 
-        // --- Novos Providers para Cadastro de Pessoa ---
-
-        // 2. Prover o PersonService
         Provider<PersonService>(create: (_) => PersonService()),
+        Provider<ServicePropertySearch>(create: (_) => ServicePropertySearch()),
 
-        // 3. Prover o PersonViewModel (que usa o PersonService)
         ChangeNotifierProvider<PersonViewModel>(
-          create: (context) => PersonViewModel(
-            // Pega o PersonService que acabamos de prover acima
-            context.read<PersonService>(),
-          ),
+          create: (context) => PersonViewModel(context.read<PersonService>()),
         ),
-
-        // (Você pode adicionar mais providers para outros módulos aqui no futuro)
+        ChangeNotifierProvider<PropertyViewModel>(
+          create: (context) =>
+              PropertyViewModel(context.read<ServicePropertySearch>()),
+        ),
+        ChangeNotifierProvider<SearchPropertyViewModel>(
+          create: (context) =>
+              SearchPropertyViewModel(context.read<ServicePropertySearch>()),
+        ),
       ],
 
-      // 4. O 'child' do MultiProvider é o seu MaterialApp
       child: MaterialApp(
         title: 'LactoView Mobile',
         debugShowCheckedModeBanner: false,
@@ -53,7 +50,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: const MainScreen(), // MainScreen agora tem acesso a tudo
+        home: const MainScreen(),
       ),
     );
   }

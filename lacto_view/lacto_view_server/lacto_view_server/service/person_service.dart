@@ -59,10 +59,8 @@ class PersonService {
       final newPersonRef = _personRef.doc();
       final newPersonId = newPersonRef.id;
 
-      //O 'user' usará o mesmo ID
       final newUserRef = _userRef.doc(newPersonId);
 
-      //Prepara os dados do 'Person'
       final personData = person.toMap();
       final now = DateTime.now().toIso8601String();
       personData['created_at'] = now;
@@ -73,7 +71,9 @@ class PersonService {
       final userData = {
         'person_id': newPersonId,
         'login_keys': loginKeys,
-        'password': hashedPassword, //Salva a HASH
+        'password': hashedPassword,
+        'created_at': now,
+        'updated_at': now, //Salva a HASH
       };
 
       await _firestore.runTransaction((transaction) async {

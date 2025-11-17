@@ -1,8 +1,11 @@
-// views/form_person_view.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// Importe seu ViewModel
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:provider/provider.dart';
+
 import '../view_model/view_models_person.dart';
+import '../view_model/search_property_view_model.dart';
+import '../model/property_model.dart';
 
 class FormPersonView extends StatefulWidget {
   @override
@@ -14,7 +17,8 @@ class _FormPersonViewState extends State<FormPersonView> {
 
   String? _selectedRole;
   final List<String> _roles = ['admin', 'coletor', 'produtor'];
-  bool _isActive = false;
+  bool _isActive = true;
+  Property? _selectedProperty;
 
   final _searchPropertyController = TextEditingController();
   final _nameController = TextEditingController();
@@ -26,8 +30,8 @@ class _FormPersonViewState extends State<FormPersonView> {
 
   @override
   void dispose() {
-    _searchPropertyController.dispose();
     _nameController.dispose();
+    _searchPropertyController.dispose();
     _cpfCnpjController.dispose();
     _cadproController.dispose();
     _emailController.dispose();
@@ -63,6 +67,8 @@ class _FormPersonViewState extends State<FormPersonView> {
         );
         _formKey.currentState!.reset();
         _nameController.clear();
+        _searchPropertyController.clear();
+        _cadproController.clear();
         _cpfCnpjController.clear();
         _emailController.clear();
         _telefoneController.clear();
@@ -87,9 +93,19 @@ class _FormPersonViewState extends State<FormPersonView> {
   Widget build(BuildContext context) {
     // Ouve o ViewModel para saber se está carregando
     final isLoading = context.watch<PersonViewModel>().isLoading;
+    final searchViewModel = context.read<SearchPropertyViewModel>();
 
     return Scaffold(
-      appBar: AppBar(title: Text("Cadastro (MVVM)")),
+      appBar: AppBar(
+        title: const Text(
+          'Novo Usuário',
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.green[800],
+        // Adiciona automaticamente a seta de "voltar"
+        iconTheme: const IconThemeData(color: Colors.white),
+        automaticallyImplyLeading: true,
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -126,17 +142,21 @@ class _FormPersonViewState extends State<FormPersonView> {
                   SizedBox(height: 20),
                   if (_selectedRole != null) ...[
                     // --- 2 BOTÃO ATIVAR/DESATIVAR (SWITCH) ---
-                    Container(
-                      //scódigo Switch aqui
-                      child: Switch(
-                        value: _isActive,
-                        onChanged: (bool value) {
-                          setState(() {
-                            _isActive = value;
-                          });
-                        },
-                        // ...
+                    SwitchListTile(
+                      //cdigo Switch aqui
+                      title: Text('Usuário Ativo?'),
+                      value: _isActive,
+                      activeColor: Colors.green.shade600,
+                      inactiveTrackColor: Colors.grey.shade400,
+                      thumbColor: MaterialStateProperty.all<Color>(
+                        Colors.white,
                       ),
+                      onChanged: (bool value) {
+                        setState(() {
+                          _isActive = value;
+                        });
+                      },
+                      // ...
                     ),
                     SizedBox(height: 20),
                     Divider(),
@@ -153,6 +173,90 @@ class _FormPersonViewState extends State<FormPersonView> {
                           : null,
                     ),
                     SizedBox(height: 16),
+                    // Campo para Buscar Propriedades --->>>
+                    if (_selectedRole == 'produtor') ...[
+                      FormField<Property>(
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Selecione uma Propriedade';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _selectedProperty = value;
+                        },
+                        builder: (FormFieldState<Property> field) {
+                          return TypeAheadField<Property>(
+                            debounceDuration: const Duration(seconds: 1),
+
+                            suggestionsCallback: (pattern) async {
+                              if (pattern.isEmpty) {
+                                return [];
+                              }
+                              await searchViewModel.search(pattern, limit: 5);
+                              return searchViewModel.results;
+                            },
+                            builder: (context, controller, focusNode) {
+                              controller.text = _searchPropertyController.text;
+
+                              return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                decoration: InputDecoration(
+                                  labelText: "Propriedade",
+                                  hintText: "Buscar Propriedade...",
+                                  prefixIcon: const Icon(Icons.search),
+                                  filled: true,
+                                  fillColor: Colors.grey[200],
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  errorText: field.errorText,
+                                ),
+                              );
+                            },
+                            itemBuilder: (context, suggestion) {
+                              return ListTile(
+                                title: Text(suggestion.name),
+                                subtitle: Text(suggestion.city),
+                              );
+                            },
+                            onSelected: (suggestion) {
+                              _searchPropertyController.text = suggestion.name;
+                              field.didChange(suggestion);
+                              print(
+                                "Propriedade selecionada: ${suggestion.id}",
+                              );
+                            },
+                            loadingBuilder: (context) => const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                            emptyBuilder: (context) => const ListTile(
+                              title: Text("Nenhuma propriedade encontrada"),
+                            ),
+                            errorBuilder: (context, error) =>
+                                ListTile(title: Text("Erro ao buscar: $error")),
+                          );
+                        },
+                      ),
+                    ],
+                    /*TextFormField(
+                        controller: _searchPropertyController,
+                        decoration: InputDecoration(
+                          //estilo barra de busca
+                          labelText: "Propriedade",
+                          hintText: "Buscar Propriedade...",
+                          prefixIcon: Icon(Icons.search),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),*/
                     // --- 4 CAMPO CPF/CNPJ ---
                     TextFormField(
                       controller: _cpfCnpjController,

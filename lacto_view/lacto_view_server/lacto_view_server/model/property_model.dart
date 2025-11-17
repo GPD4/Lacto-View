@@ -6,6 +6,7 @@ class Property {
   final String city;
   final String state;
   final int tanksQtd;
+  final bool isActive;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -17,6 +18,7 @@ class Property {
     required this.city,
     required this.state,
     required this.tanksQtd,
+    required this.isActive,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -34,6 +36,7 @@ class Property {
       city: map['city'] as String,
       state: map['state'] as String,
       tanksQtd: map['tanks_qtd'] as int,
+      isActive: map['is_active'] as bool? ?? true,
       createdAt: now,
       updatedAt: now,
     );
@@ -51,11 +54,12 @@ class Property {
       city: json['city'] as String,
       state: json['state'] as String,
       tanksQtd: json['tanks_qtd'] as int,
+      isActive: json['is_active'] as bool? ?? true,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : null,
       updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['update_at'] as String)
+          ? DateTime.parse(json['updated_at'] as String)
           : null,
     );
   }
@@ -69,6 +73,7 @@ class Property {
       'city': city,
       'state': state,
       'tanks_qtd': tanksQtd,
+      'is_active': isActive,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
@@ -82,6 +87,7 @@ class Property {
     String? city,
     String? state,
     int? tanksQtd,
+    bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -93,6 +99,7 @@ class Property {
       city: city ?? this.city,
       state: state ?? this.state,
       tanksQtd: tanksQtd ?? this.tanksQtd,
+      isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
