@@ -4,10 +4,11 @@ class Person {
   final String cpfCnpj;
   final String? cadpro;
   final String? email;
-  final String telefone;
-  final String password;
+  final String phone;
+  final String? password;
   final String role;
-  final String profileImg;
+  final String? propertyId;
+  final String? profileImg;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -16,13 +17,14 @@ class Person {
     this.id,
     required this.name,
     required this.cpfCnpj,
-    required this.cadpro,
+    this.cadpro,
     required this.email,
-    required this.telefone,
-    required this.password,
+    required this.phone,
+    this.password,
     required this.role,
-    required this.profileImg,
-    required this.isActive,
+    this.propertyId,
+    this.profileImg,
+    this.isActive = true,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -34,9 +36,10 @@ class Person {
       cpfCnpj: json['cpf_cnpj'],
       cadpro: json['cadpro'],
       email: json['email'],
-      telefone: json['telefone'],
+      phone: json['phone'],
       password: json['password'],
       role: json['role'],
+      propertyId: json['property_id'],
       profileImg: json['profile_img'],
       isActive: json['is_active'],
       createdAt: DateTime.parse(json['created_at']),
@@ -44,20 +47,33 @@ class Person {
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toMap() {
     return {
-      'id': id,
       'name': name,
       'cpf_cnpj': cpfCnpj,
       'cadpro': cadpro,
       'email': email,
-      'telefone': telefone,
+      'phone': phone,
       'password': password,
       'role': role,
+      'property_id': propertyId,
       'profile_img': profileImg,
       'is_active': isActive,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'cpf_cnpj': cpfCnpj,
+      'cadpro': cadpro,
+      'email': email,
+      'phone': phone,
+      'password': password,
+      'role': role,
+      'property_id': propertyId,
+      'profile_img': profileImg,
+      'is_active': isActive,
     };
   }
 }

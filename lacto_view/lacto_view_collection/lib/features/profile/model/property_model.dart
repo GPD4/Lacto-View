@@ -38,9 +38,8 @@ class Property {
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toMap() {
     return {
-      'id': id,
       'name': name,
       'cep': cep,
       'street': street,
@@ -48,8 +47,18 @@ class Property {
       'state': state,
       'tanks_qtd': tanksQtd,
       'is_active': isActive,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'cep': cep,
+      'street': street,
+      'city': city,
+      'state': state,
+      'tanks_qtd': tanksQtd,
+      'is_active': isActive,
     };
   }
 }

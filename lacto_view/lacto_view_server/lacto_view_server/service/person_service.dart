@@ -13,14 +13,14 @@ class PersonService {
   late final CollectionReference<Map<String, dynamic>> _userRef;
   late final CollectionReference<Map<String, dynamic>> _producerRef;
   late final CollectionReference<Map<String, dynamic>> _collectorRef;
-  late final CollectionReference<Map<String, dynamic>> _producerPropertyRef;
+// late final CollectionReference<Map<String, dynamic>> _producerPropertyRef;
 
   PersonService(this._firestore, this._auth) {
     _personRef = _firestore.collection('person');
     _userRef = _firestore.collection('user');
     _producerRef = _firestore.collection('producer');
     _collectorRef = _firestore.collection('collector');
-    _producerPropertyRef = _firestore.collection('producer_property');
+//  _producerPropertyRef = _firestore.collection('producer_property');
   }
 
   Future<Person> createPerson(
@@ -50,32 +50,45 @@ class PersonService {
       throw Exception('Role = "producer", mas o "propertyId" está ausente');
     }
 
+    // 2. CRIAÇÃO NO FIREBASE AUTHENTICATION
+
+    UserRecord? authUser;
+
+    try {
+      authUser = await _auth.createUser(CreateRequest(
+        email: person.email,
+        password: password,
+        displayName: person.name,
+        disabled: !person.isActive,
+      ));
+    } catch (e) {
+      throw Exception('Erro ao criar usuario no Firebase Auth: $e');
+    }
+
     //criptografar a senha(hashing)
     final bytes = utf8.encode(password);
     final hash = sha256.convert(bytes);
     final hashedPassword = hash.toString();
 
+    final newPersonRef = _personRef.doc();
+    final newPersonId = newPersonRef.id;
+    final newUserRef = _userRef.doc(newPersonId);
+    final personData = person.toMap();
+    final now = DateTime.now().toIso8601String();
+    personData['created_at'] = now;
+    personData['updated_at'] = now;
+    personData.remove('id');
+    //Prepara os dados do 'User'
+    final userData = {
+      'person_id': newPersonId,
+      'firebase_auth_uid': authUser.uid,
+      'login_keys': loginKeys,
+      'password': hashedPassword,
+      'created_at': now,
+      'updated_at': now, //Salva a HASH
+    };
+
     try {
-      final newPersonRef = _personRef.doc();
-      final newPersonId = newPersonRef.id;
-
-      final newUserRef = _userRef.doc(newPersonId);
-
-      final personData = person.toMap();
-      final now = DateTime.now().toIso8601String();
-      personData['created_at'] = now;
-      personData['updated_at'] = now;
-      personData.remove('id');
-
-      //Prepara os dados do 'User'
-      final userData = {
-        'person_id': newPersonId,
-        'login_keys': loginKeys,
-        'password': hashedPassword,
-        'created_at': now,
-        'updated_at': now, //Salva a HASH
-      };
-
       await _firestore.runTransaction((transaction) async {
         //Cria o Person
         transaction.set(newPersonRef, personData);
@@ -95,18 +108,20 @@ class PersonService {
           transaction.set(newProducerRef, producerData);
         }
 
-        //Vinculo de Producer e Property = producer_property
+        //Vinculo de Producer e Property = producer_property(objeto de referencia)
 
         if (propertyId != null) {
           print('>>> DEBUG: Bloco producer_property está executando.');
           print(
               '>>> DEBUG: Linkando Person $newPersonId com Property $propertyId');
           //Cria ID composto "person_id + property_id = producer_property_id"
-          final linkId = '${newPersonId}_$propertyId';
-          final newLinkRef = _producerPropertyRef.doc(linkId);
+
+          final newLinkRef = _personRef
+              .doc(newPersonId)
+              .collection('producer_property')
+              .doc(); // auto ID
 
           final linkData = {
-            'person_id': newPersonId,
             'property_id': propertyId,
             'created_at': now,
             'updated_at': now,
@@ -121,6 +136,12 @@ class PersonService {
         updatedAt: DateTime.parse(now),
       );
     } catch (e) {
+      print("Erro na transação do Firestore: $e. Revertendo Firebase Auth...");
+      try {
+        await _auth.deleteUser(authUser!.uid);
+      } catch (deleteError) {
+        print("CRÍTICO: Falha ao reverter usuário Auth: $deleteError");
+      }
       print("Erro ao criar usuario: $e");
       rethrow;
     }

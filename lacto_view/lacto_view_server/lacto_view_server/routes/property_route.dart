@@ -8,6 +8,10 @@ Future<Response> onRequest(RequestContext context) async {
   final propertyService = context.read<PropertyService>();
   final auth = context.read<Auth>();
 
+  if (context.request.method == HttpMethod.options) {
+    return Response(statusCode: HttpStatus.noContent);
+  }
+
   if (context.request.method != HttpMethod.post) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
   }
@@ -31,17 +35,22 @@ Future<Response> onRequest(RequestContext context) async {
   try {
     final requestBody = await context.request.json();
 
+    print('--- DEBUG PROPERTY ROUTE: Body recebido: $requestBody');
+
     final data = requestBody as Map<String, dynamic>;
 
     final property = Property.fromMap(data);
 
     final newProperty = await propertyService.createProperty(uid, property);
 
+    print('--- DEBUG PROPERTY ROUTE: Sucesso. ID Criado: ${newProperty.id}');
+
     return Response.json(
       body: newProperty.toMap(),
       statusCode: HttpStatus.created, //Code: 201
     );
   } catch (e) {
+    print('Erro ao criar propriedade: $e');
     return Response.json(body: {'error': e.toString()}, statusCode: 400);
   }
 }

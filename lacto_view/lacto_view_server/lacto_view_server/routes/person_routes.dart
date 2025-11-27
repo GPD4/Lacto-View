@@ -9,6 +9,10 @@ Future<Response> onRequest(RequestContext context) async {
   final personService = context.read<PersonService>();
   final auth = context.read<Auth>();
 
+  if (context.request.method == HttpMethod.options) {
+    return Response(statusCode: HttpStatus.noContent);
+  }
+
   if (context.request.method != HttpMethod.post) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
   }
@@ -39,7 +43,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     final cadpro = data.remove('cadpro') as String?;
 
-    final propertyId = data.remove('property') as String?;
+    final propertyId = data.remove('property_id') as String?;
 
     if (password == null || password.isEmpty) {
       return Response.json(

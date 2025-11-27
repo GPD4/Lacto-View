@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../model/property_model.dart';
-import '../service/service_property_search.dart';
+import '../service/service_property.dart';
 
 class PropertyViewModel extends ChangeNotifier {
-  final ServicePropertySearch _propertyService;
-
-  PropertyViewModel(this._propertyService);
+  final PropertyService _service;
+  PropertyViewModel(this._service);
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -26,12 +25,10 @@ class PropertyViewModel extends ChangeNotifier {
     required int tanksQtd,
     required bool isActive,
   }) async {
-    // 1. Inicia o estado de carregamento
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners(); // Notifica a View que o estado mudou
+    notifyListeners();
 
-    // 2. Criar o objeto Person (Lógica movida para cá)
     final now = DateTime.now();
     Property newProperty = Property(
       name: name,
@@ -46,7 +43,7 @@ class PropertyViewModel extends ChangeNotifier {
     );
 
     // 3. Chamar o Service
-    bool success = await _propertyService.createProperty(newProperty);
+    final success = await _service.createProperty(property: newProperty);
 
     // 4. Atualizar o estado final
     _isLoading = false;
@@ -58,5 +55,23 @@ class PropertyViewModel extends ChangeNotifier {
 
     notifyListeners(); // Notifica a View sobre o fim do carregamento
     return success;
+  }
+
+  Future<List<Property>> search(String query) async {
+    _setLoading(true);
+    try {
+      final results = await _service.searchProperties(query);
+      _setLoading(false);
+      return results;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _setLoading(false);
+      return [];
+    }
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners(); // Notifica a View para atualizar a tela (loading spinner)
   }
 }

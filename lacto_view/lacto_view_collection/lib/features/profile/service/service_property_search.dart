@@ -8,22 +8,6 @@ class ServicePropertySearch {
   /// para se comunicar com seu backend Dart Frog.
   final String _baseUrl = 'http://localhost:8080';
 
-  Future<bool> createProperty(Property property) async {
-    try {
-      print("Chamando o backend para salvar:");
-      print(property.toJson());
-
-      await Future.delayed(Duration(seconds: 2));
-
-      print("Backend respondeu: SUCESSO");
-
-      return true;
-    } catch (e) {
-      print("Erro ao salvar property: $e");
-      return false; // Retorna false em caso de erro
-    }
-  }
-
   Future<List<Property>> searchProperties(String query, {int? limit}) async {
     final params = <String, String>{'q': query};
 

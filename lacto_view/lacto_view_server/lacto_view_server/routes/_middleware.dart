@@ -14,6 +14,7 @@ import '../service/person_service.dart';
 import '../service/collection_service.dart';
 import '../service/producer_service.dart';
 import '../service/property_service.dart';
+import '../service/user_service.dart';
 
 FirebaseAdminApp? _firebaseApp;
 
@@ -64,16 +65,33 @@ Handler middleware(Handler handler) {
         ))
         .use(provider<CollectionService>(
           (_) => CollectionService(firestore),
+        ))
+        .use(provider<UserService>(
+          (_) => UserService(firestore, auth),
         ));
 
+    // 👉 TRATAMENTO DE REQUISIÇÕES OPTIONS (CORS PREFLIGHT)
+    if (context.request.method == HttpMethod.options) {
+      return Response(
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
+          'Access-Control-Allow-Headers': 'Origin, Content-Type, Authorization',
+        },
+      );
+    }
+
+    // 👉 Continua o fluxo normal
     final response = await diHandler(context);
 
+    // 👉 Garante CORS em todas as respostas
     return response.copyWith(
       headers: {
         ...response.headers,
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
-        'Access-Control-Allow-Headers': 'Origin, Content-Type',
+        'Access-Control-Allow-Headers': 'Origin, Content-Type, Authorization',
       },
     );
   };

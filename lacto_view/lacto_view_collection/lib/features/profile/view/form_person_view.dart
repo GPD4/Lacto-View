@@ -16,7 +16,13 @@ class _FormPersonViewState extends State<FormPersonView> {
   final _formKey = GlobalKey<FormState>();
 
   String? _selectedRole;
-  final List<String> _roles = ['admin', 'coletor', 'produtor'];
+
+  final Map<String, String> _roles = {
+    'Administrador': 'admin',
+    'Coletor': 'collector',
+    'Produtor': 'producer',
+  };
+
   bool _isActive = true;
   Property? _selectedProperty;
 
@@ -25,7 +31,7 @@ class _FormPersonViewState extends State<FormPersonView> {
   final _cpfCnpjController = TextEditingController();
   final _cadproController = TextEditingController();
   final _emailController = TextEditingController();
-  final _telefoneController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
@@ -35,7 +41,7 @@ class _FormPersonViewState extends State<FormPersonView> {
     _cpfCnpjController.dispose();
     _cadproController.dispose();
     _emailController.dispose();
-    _telefoneController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -53,9 +59,10 @@ class _FormPersonViewState extends State<FormPersonView> {
       cpfCnpj: _cpfCnpjController.text,
       cadpro: _cadproController.text,
       email: _emailController.text,
-      telefone: _telefoneController.text,
+      phone: _phoneController.text,
       password: _passwordController.text,
       role: _selectedRole!,
+      propertyId: _selectedProperty?.id,
       isActive: _isActive,
     );
 
@@ -71,7 +78,7 @@ class _FormPersonViewState extends State<FormPersonView> {
         _cadproController.clear();
         _cpfCnpjController.clear();
         _emailController.clear();
-        _telefoneController.clear();
+        _phoneController.clear();
         _passwordController.clear();
         setState(() {
           _selectedRole = null;
@@ -132,10 +139,10 @@ class _FormPersonViewState extends State<FormPersonView> {
                         _selectedRole = newValue;
                       });
                     },
-                    items: _roles.map<DropdownMenuItem<String>>((String value) {
+                    items: _roles.entries.map((entry) {
                       return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
+                        value: entry.value,
+                        child: Text(entry.key),
                       );
                     }).toList(),
                   ),
@@ -174,7 +181,7 @@ class _FormPersonViewState extends State<FormPersonView> {
                     ),
                     SizedBox(height: 16),
                     // Campo para Buscar Propriedades --->>>
-                    if (_selectedRole == 'produtor') ...[
+                    if (_selectedRole == 'producer') ...[
                       FormField<Property>(
                         validator: (value) {
                           if (value == null) {
@@ -225,6 +232,7 @@ class _FormPersonViewState extends State<FormPersonView> {
                             onSelected: (suggestion) {
                               _searchPropertyController.text = suggestion.name;
                               field.didChange(suggestion);
+                              _selectedProperty = suggestion;
                               print(
                                 "Propriedade selecionada: ${suggestion.id}",
                               );
@@ -242,21 +250,6 @@ class _FormPersonViewState extends State<FormPersonView> {
                         },
                       ),
                     ],
-                    /*TextFormField(
-                        controller: _searchPropertyController,
-                        decoration: InputDecoration(
-                          //estilo barra de busca
-                          labelText: "Propriedade",
-                          hintText: "Buscar Propriedade...",
-                          prefixIcon: Icon(Icons.search),
-                          filled: true,
-                          fillColor: Colors.grey[200],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),*/
                     // --- 4 CAMPO CPF/CNPJ ---
                     TextFormField(
                       controller: _cpfCnpjController,
@@ -269,7 +262,7 @@ class _FormPersonViewState extends State<FormPersonView> {
                           : null,
                     ),
                     SizedBox(height: 16),
-                    if (_selectedRole == 'produtor') ...[
+                    if (_selectedRole == 'producer') ...[
                       // ---5 CAMPO CadPro ---
                       TextFormField(
                         controller: _cadproController,
@@ -295,9 +288,9 @@ class _FormPersonViewState extends State<FormPersonView> {
                           : null,
                     ),
                     SizedBox(height: 16),
-                    // --- 7 CAMPO Telefone ---
+                    // --- 7 CAMPO phone ---
                     TextFormField(
-                      controller: _telefoneController,
+                      controller: _phoneController,
                       decoration: InputDecoration(
                         labelText: "Telefone",
                         prefixIcon: Icon(Icons.phone),

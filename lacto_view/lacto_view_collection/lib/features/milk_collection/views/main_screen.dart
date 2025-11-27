@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../widgets/nav_bar.dart';
 import '../../home/view/home_view.dart';
 import '../../profile/view/profile_view.dart';
-import '../../search/view/search_view.dart';
+import 'search_view.dart';
 
 import 'views_collection.dart';
 

@@ -1,33 +1,72 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../model/person_model.dart';
 
-// service/person_service.dart
-
 class PersonService {
-  /// Salva uma nova pessoa no backend.
-  /// No futuro, é aqui que você colocará seu código http.post
-  /// para se comunicar com seu backend Dart Frog.
-  Future<bool> createPerson(Person person) async {
+  final String _baseUrl = 'http://localhost:8080';
+
+  Future<bool> createPerson({
+    required Person person,
+    required String password,
+    String? cadpro,
+    String? propertyId,
+  }) async {
     try {
       // --- INÍCIO: LÓGICA DO BACKEND (EX: Dart Frog) ---
-      print("Chamando o backend para salvar:");
+      print("Chamando o backend para salvar novo 'person':");
+
       print(person.toJson());
 
-      // Simula um atraso de rede de 2 segundos
-      await Future.delayed(Duration(seconds: 2));
+      final Map<String, dynamic> requestBody = person.toMap();
 
-      // Simula uma resposta de sucesso do backend
-      print("Backend respondeu: SUCESSO");
-      // --- FIM: LÓGICA DO BACKEND ---
+      requestBody['password'] = password;
 
-      return true; // Retorna true em caso de sucesso
+      if (cadpro != null && cadpro != cadpro.isNotEmpty) {
+        requestBody['cadpro'] = cadpro;
+      }
+
+      String? token;
+
+      try {
+        token = await FirebaseAuth.instance.currentUser?.getIdToken();
+      } catch (e) {
+        print("Aviso: Não foi possível obter token do usuário logado: $e");
+      }
+
+      if (token == null) {
+        print("Usuário não está logado no Firebase Auth do App.");
+        return false;
+      }
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl/person_routes'),
+        headers: headers,
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print("Backend respondeu: SUCESSO (Criado)");
+        print("Dados: ${response.body}");
+        return true;
+      } else {
+        print("Erro do Backend: ${response.statusCode}");
+        print("Mensagem: ${response.body}");
+        return false;
+      }
     } catch (e) {
-      print("Erro ao salvar pessoa: $e");
-      return false; // Retorna false em caso de erro
+      print("Erro de conexão ou exceção local: $e");
+      return false;
     }
-  }
 
-  // Aqui você também teria outros métodos, como:
-  // Future<List<Person>> getPersons() async { ... }
-  // Future<Person> updatePerson(String id, Person person) async { ... }
-  // Future<void> deletePerson(String id) async { ... }
+    // Future<List<Person>> getPersons() async { ... }
+    // Future<Person> updatePerson(String id, Person person) async { ... }
+    // Future<void> deletePerson(String id) async { ... }
+  }
 }

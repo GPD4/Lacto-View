@@ -32,12 +32,27 @@ Cadastrar usuário -
     "email": "{{$randomEmail}}",
     "phone": "{{phoneBR}}",
     "role": "producer",
-    "property": "JT8p2EmfFXhKwamVfyBu",
+    "property_id": "xBU7nCSf5Ld2GgFmyTNt",
     "cadpro": "123256ab",
     "password": "senhaForte123!",
     "is_active": true,
     "profile_img": "http://example.com/images/joao.png"
 }
+
+json retornado do front(flutter) Person -
+
+{
+    name: hdiehjdfijdijdiwjd, 
+    cpf_cnpj: 2323232323, 
+    cadpro: 32323232, 
+    email: fenfioemnfoemfo@gmail.com, 
+    phone: 3203820320390, 
+    password: 2932039203neckinekdf, 
+    role: producer, 
+    property_id: OSIanB3xhNz1p7iCXWIO, 
+    profile_img:assets/images/default_profile.png, 
+    is_active: true
+} 
 
 Cadastrar Propriedade - 
 
@@ -61,6 +76,31 @@ Cadastrar Propriedade -
     "tanks_qtd": 2
 }
 
+Collection -
+
+{
+  "producer_id": "PROD_12345",
+  "producer_name": "{{$randomFullName}}",
+  "producer_property_id": "PROP_987",
+  "property_name": "Fazenda Santa Luzia",
+  "collector_id": "COL_001",
+  "collector_name": "{{$randomFullName}}",
+  "rejection": false,
+  "rejection_reason": null,
+  "volume_lt": 540.5,
+  "temperature": 3.8,
+  "producer_present": true,
+  "ph": 6.7,
+  "numtanque": "T-01",
+  "sample": true,
+  "tube_number": "A-104",
+  "observation": "Estrada com muita lama, acesso difícil.",
+  "status": "coletado",
+  "analysis_id": null
+}
+
+
+
 Get para propriedades:
 
 http://localhost:8080/property/search?q=TOLEDO
@@ -75,5 +115,30 @@ Cadastrar Coleta -
 
 }
 
+
+
+
+{
+    id: 1763412178321, //Não devem aparecer
+    producer_id: 101, 
+    producer_property_id: 404, 
+    producer_name: Wylde,
+    property_name: Black Label Society,
+    rejection_reason: 1, 
+    rejection: false, 
+    temperature: 5, 
+    volume_lt:2, 
+    producer_present: false, 
+    ph: 76, 
+    numtanque: 2, 
+    observation: dwdwdwdwdwdwd, 
+    sample: false,
+    tube_number: , 
+    status: PENDING_ANALYSIS, 
+    collector_id: 55, 
+    analysis_id: 0, 
+    created_at: 2025-11-17T17:42:58.321, //Não devem aparecer
+    updated_at: 2025-11-17T17:42:58.321 //Não devem aparecer
+}
 
 

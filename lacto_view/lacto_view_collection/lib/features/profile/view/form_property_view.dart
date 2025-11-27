@@ -60,6 +60,7 @@ class _FormPropertyViewState extends State<FormPropertyView> {
         _nameController.clear();
         _cepController.clear();
         _streetController.clear();
+        _cityController.clear();
         _stateController.clear();
         _tanksQtdController.clear();
         setState(() {
@@ -148,6 +149,18 @@ class _FormPropertyViewState extends State<FormPropertyView> {
                     decoration: InputDecoration(
                       labelText: "Nome da Rua",
                       prefixIcon: Icon(Icons.signpost),
+                    ),
+                    textInputAction: TextInputAction.next,
+                    validator: (value) => (value == null || value.isEmpty)
+                        ? 'Campo obrigatório'
+                        : null,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _cityController,
+                    decoration: InputDecoration(
+                      labelText: "Nome da Cidade",
+                      prefixIcon: Icon(Icons.location_city),
                     ),
                     textInputAction: TextInputAction.next,
                     validator: (value) => (value == null || value.isEmpty)

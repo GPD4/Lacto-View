@@ -75,10 +75,9 @@ class _MilkCollectionFormViewState extends State<MilkCollectionFormView> {
   void _saveForm() {
     if (_formKey.currentState!.validate()) {
       final newCollection = MilkCollection(
-        id: DateTime.now().millisecondsSinceEpoch,
-        producerId: _selectedProducer!.id,
+        producerId: _selectedProducer!.id.toString(),
         producerName: _selectedProducer!.name.split(' ').sublist(1).join(' '),
-        producerPropertyId: 404,
+        producerPropertyId: '404',
         propertyName: _selectedProducer!.propertyName,
         rejection: _isRejectionMode,
         rejectionReason: _selectedRejectionReason ?? '1',
@@ -91,7 +90,8 @@ class _MilkCollectionFormViewState extends State<MilkCollectionFormView> {
         tubeNumber: _sampleCollected ? _tubeNumberController.text : '',
         observation: _observationController.text,
         status: "PENDING_ANALYSIS",
-        collectorId: 55,
+        collectorName: 'teste',
+        collectorId: '55',
         analysisId: 0,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
