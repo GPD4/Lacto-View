@@ -1,0 +1,268 @@
+app:
+  id: com.example.lacto_view
+  name: Lacto-View
+  version: 1.0.0+1
+  description: Sistema de coleta e gestão de produção leiteira
+
+permissions:
+  - name: INTERNET
+    type: normal
+    feature: Autenticação de usuários via Firebase Authentication
+    data_min: E-mail, credenciais de login, tokens de autenticação
+    request_timing: Concedida automaticamente na instalação (permissão normal)
+    rationale: |
+      O Firebase Authentication requer conexão de rede para validar credenciais,
+      gerenciar sessões e sincronizar tokens de autenticação. Sem esta permissão,
+      o app não pode funcionar, pois toda a arquitetura depende de autenticação
+      centralizada no Firebase.
+    alternative: |
+      Não há alternativa viável. O app é online-first e depende de autenticação
+      para acesso seguro aos dados. Modo offline futuro manteria apenas cache
+      de dados já autenticados.
+    storage: |
+      Tokens de autenticação armazenados de forma segura pelo Firebase SDK.
+      Dados transmitidos via HTTPS/TLS. Credenciais nunca armazenadas localmente.
+      Ciclo de vida: mantidos durante sessão ativa, removidos no logout.
+    play_policy: |
+      Firebase Authentication - Política de Dados do Google.
+      Declarar na Data Safety Section: coleta de e-mail para autenticação.
+      Não há uso para publicidade ou compartilhamento com terceiros.
+
+  - name: INTERNET
+    type: normal
+    feature: Sincronização de dados de coleta com Cloud Firestore
+    data_min: |
+      Dados de coleta de leite (volume, temperatura, pH, número de tanque),
+      informações de produtores (nome, ID, propriedade),
+      dados de coletor (nome, ID, role)
+    request_timing: Concedida automaticamente na instalação (permissão normal)
+    rationale: |
+      Cloud Firestore é o banco de dados principal do app. Todas as operações de
+      leitura e escrita (criar coleta, buscar produtores, listar histórico) requerem
+      conexão de rede. Os dados precisam estar sincronizados em tempo real para
+      múltiplos coletores e administradores.
+    alternative: |
+      Cache local temporário via SharedPreferences para visualização de dados
+      recentes quando offline. Sincronização automática quando conexão for
+      restabelecida. Funcionalidade limitada sem internet.
+    storage: |
+      Dados armazenados no Cloud Firestore com criptografia em trânsito (TLS)
+      e em repouso. Regras de segurança Firestore controlam acesso baseado em
+      autenticação. Retenção indefinida para histórico regulatório de laticínios.
+    play_policy: |
+      Cloud Firestore - Política de Dados do Google Cloud.
+      Declarar na Data Safety Section: coleta de dados de negócio (não-pessoais
+      sensíveis) para funcionalidade do app. Dados protegidos por autenticação.
+
+  - name: N/A (SharedPreferences - armazenamento interno)
+    type: internal_storage
+    feature: Persistência local de preferências e configurações do usuário
+    data_min: |
+      Preferências de UI, sessão de usuário (último login),
+      cache temporário de dados (produtores recentes, última coleta)
+    request_timing: N/A - armazenamento no sandbox privado do app
+    rationale: |
+      SharedPreferences é o mecanismo padrão do Android para armazenar preferências
+      pequenas e configurações de app. Usado para melhorar UX (lembrar preferências)
+      e permitir funcionalidade limitada offline.
+    alternative: |
+      Não aplicável. É o método recomendado pelo Android para este tipo de dado.
+      Alternativa seria não salvar preferências, resultando em UX inferior.
+    storage: |
+      Dados armazenados no sandbox privado do app (/data/data/com.example.lacto_view).
+      Não acessível por outros apps. Removido automaticamente na desinstalação.
+      Sem criptografia adicional necessária (dados não-sensíveis).
+    play_policy: |
+      Não requer declaração específica. Armazenamento interno padrão do Android.
+      Mencionar na Política de Privacidade que configurações são salvas localmente.
+
+  - name: QUERY_ALL_PACKAGES (implícito via intent filter)
+    type: normal
+    feature: Suporte a ACTION_PROCESS_TEXT do Flutter
+    data_min: Metadados de intents disponíveis (não acessa conteúdo de outros apps)
+    request_timing: Declarado implicitamente via <queries> no AndroidManifest
+    rationale: |
+      O Flutter framework inclui suporte para processar texto entre apps
+      (ProcessTextPlugin). É uma funcionalidade opcional do framework, não usada
+      ativamente pelo Lacto-View, mas declarada por padrão.
+    alternative: |
+      App funciona completamente sem esta funcionalidade. É legado do template
+      Flutter. Poderia ser removida se necessário, mas não causa impacto.
+    storage: |
+      N/A - não há armazenamento de dados. Apenas permite descoberta de intents.
+    play_policy: |
+      Declarar uso de <queries> apenas para funcionalidade padrão do Flutter.
+      Não há acesso real a dados de outros apps.
+
+# Permissões deliberadamente NÃO solicitadas
+permissions_not_requested:
+  - name: CAMERA
+    reason: |
+      O app registra dados numéricos (volume, temperatura, pH) através de campos
+      de texto. Não há necessidade de capturar fotos de tanques, documentos ou QR codes.
+      Futuras versões poderiam adicionar foto do tanque como feature opcional.
+    
+  - name: ACCESS_FINE_LOCATION / ACCESS_COARSE_LOCATION
+    reason: |
+      Localização de propriedades é cadastrada manualmente no sistema pelos
+      administradores. Coletores não precisam de GPS durante coleta.
+      Não há rastreamento de rotas ou geolocalização.
+
+  - name: READ_EXTERNAL_STORAGE / WRITE_EXTERNAL_STORAGE
+    reason: |
+      Todo armazenamento é feito via Cloud Firestore (online) e SharedPreferences
+      (interno). Não há export/import de arquivos, anexos ou relatórios em PDF.
+      Versões futuras poderiam adicionar export de CSV como feature.
+
+  - name: READ_CONTACTS
+    reason: |
+      Lista de produtores é gerenciada no Firebase, não na agenda do dispositivo.
+      Não há integração com contatos telefônicos.
+
+  - name: RECORD_AUDIO
+    reason: Não há funcionalidade de gravação de áudio, notas de voz ou comandos por voz.
+
+  - name: CALL_PHONE / SEND_SMS
+    reason: |
+      App não faz chamadas ou envia SMS automaticamente. Contato com produtores
+      é responsabilidade manual do coletor fora do app.
+
+  - name: READ_PHONE_STATE
+    reason: Não há necessidade de ler IMEI, número de telefone ou estado de chamadas.
+
+  - name: ACCESS_BACKGROUND_LOCATION
+    reason: App não opera em background. Sem tracking de localização contínuo.
+
+  - name: BLUETOOTH / BLUETOOTH_ADMIN
+    reason: Não há integração com dispositivos Bluetooth (termômetros, balanças).
+
+  - name: NFC
+    reason: Não há leitura de tags NFC em tanques ou equipamentos.
+
+  - name: FOREGROUND_SERVICE / WAKE_LOCK
+    reason: Não há sincronização em background ou processos de longa duração.
+
+# Compliance checklist
+compliance:
+  google_play_data_safety:
+    data_collected:
+      - type: email
+        purpose: authentication
+        shared: false
+        optional: false
+        
+      - type: name
+        purpose: app_functionality
+        shared: false
+        optional: false
+        
+      - type: business_data
+        purpose: app_functionality
+        shared: false
+        optional: false
+        description: Dados de coleta de leite (volume, temperatura, pH)
+        
+    data_shared: false
+    data_usage_purposes:
+      - app_functionality
+    encryption_in_transit: true
+    encryption_at_rest: true
+    user_can_request_deletion: true
+    
+  privacy_policy:
+    required: true
+    url: TBD
+    must_include:
+      - Data collection and usage
+      - Firebase integration
+      - User rights (access, deletion)
+      - Data retention policy
+      - Contact information
+      
+  third_party_services:
+    - name: Firebase Authentication
+      purpose: User authentication
+      data_shared: Email, user ID
+      privacy_policy: https://firebase.google.com/support/privacy
+      
+    - name: Cloud Firestore
+      purpose: Data storage and sync
+      data_shared: Business data, user profile
+      privacy_policy: https://firebase.google.com/support/privacy
+
+# Data lifecycle
+data_lifecycle:
+  collection:
+    when: User creates account and uses app features
+    what: Email, name, milk collection data
+    how: Via Firebase SDK over HTTPS
+    
+  storage:
+    where: Cloud Firestore (Google Cloud)
+    how_long: Indefinitely for business records; until account deletion for personal data
+    protection: TLS in transit, encryption at rest, Firestore security rules
+    
+  usage:
+    primary_purpose: Milk collection management and business analytics
+    secondary_purpose: None
+    shared_with: None (only Firebase/Google infrastructure)
+    
+  deletion:
+    user_initiated: Logout clears local cache; account deletion removes all data
+    automatic: None (business records must be kept for regulatory compliance)
+    method: Firebase delete operations + Firestore batch delete
+
+# User consent flow
+consent:
+  login_screen:
+    message: |
+      Ao fazer login, você autoriza a coleta de seu e-mail e nome para
+      autenticação e uso do sistema de coleta de leite.
+    links:
+      - text: Política de Privacidade
+        url: TBD
+      - text: Termos de Uso
+        url: TBD
+        
+  first_run:
+    show_intro: true
+    explain_features: true
+    highlight_internet_requirement: true
+    
+  settings:
+    privacy_controls:
+      - Clear local cache
+      - Logout
+      - View privacy policy
+      - Request account deletion (future)
+
+# Testing and validation
+validation:
+  manifest_audit: Pass - only normal permissions
+  runtime_permissions_check: N/A - no dangerous permissions
+  google_play_prelaunch_report: Pending
+  data_safety_section: To be completed in Play Console
+  privacy_policy_review: To be created
+
+# Notes
+notes: |
+  Este app foi projetado com privacy-by-design:
+  - Apenas permissões normais (INTERNET implícito)
+  - Sem acesso a dados sensíveis do dispositivo
+  - Dados protegidos por autenticação
+  - Princípio do privilégio mínimo
+  - Transparência na coleta de dados
+  - Firebase fornece segurança enterprise-grade
+  
+  Conformidade com:
+  - Google Play policies
+  - LGPD (Lei Geral de Proteção de Dados - Brasil)
+  - Princípios de GDPR (design e defaults)
+
+metadata:
+  document_version: 1.0
+  created_date: 2025-11-28
+  last_updated: 2025-11-28
+  author: Equipe Lacto-View
+  reviewed_by: TBD
+  next_review_date: Before Play Store submission
