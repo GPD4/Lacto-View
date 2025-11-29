@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:provider/provider.dart';
 
 import '../view_model/view_models_person.dart';
 import '../view_model/search_property_view_model.dart';
 import '../model/property_model.dart';
+import '../utils/validators.dart';
 
 class FormPersonView extends StatefulWidget {
   @override
@@ -54,12 +55,16 @@ class _FormPersonViewState extends State<FormPersonView> {
 
     final viewModel = Provider.of<PersonViewModel>(context, listen: false);
 
+    // Remove formatação do CPF/CNPJ e telefone antes de enviar
+    final cpfCnpjClean = _cpfCnpjController.text.replaceAll(RegExp(r'[^\d]'), '');
+    final phoneClean = _phoneController.text.replaceAll(RegExp(r'[^\d]'), '');
+
     bool success = await viewModel.savePerson(
-      name: _nameController.text,
-      cpfCnpj: _cpfCnpjController.text,
-      cadpro: _cadproController.text,
-      email: _emailController.text,
-      phone: _phoneController.text,
+      name: _nameController.text.trim(),
+      cpfCnpj: cpfCnpjClean,
+      cadpro: _cadproController.text.trim(),
+      email: _emailController.text.trim().toLowerCase(),
+      phone: phoneClean,
       password: _passwordController.text,
       role: _selectedRole!,
       propertyId: _selectedProperty?.id,
@@ -70,7 +75,10 @@ class _FormPersonViewState extends State<FormPersonView> {
       // Verifica se o widget ainda está na tela
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Usuário cadastrado com sucesso!')),
+          const SnackBar(
+            content: Text('Usuário cadastrado com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
         );
         _formKey.currentState!.reset();
         _nameController.clear();
@@ -83,6 +91,7 @@ class _FormPersonViewState extends State<FormPersonView> {
         setState(() {
           _selectedRole = null;
           _isActive = false;
+          _selectedProperty = null;
         });
       } else {
         // Mostra o erro vindo do ViewModel
@@ -106,7 +115,7 @@ class _FormPersonViewState extends State<FormPersonView> {
       appBar: AppBar(
         title: const Text(
           'Novo Usuário',
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.green[800],
         // Adiciona automaticamente a seta de "voltar"
@@ -127,8 +136,8 @@ class _FormPersonViewState extends State<FormPersonView> {
                   // --- 1 SELEÇÃO DE ROLE---
                   DropdownButtonFormField<String>(
                     value: _selectedRole,
-                    hint: Text("Selecione um papel"),
-                    decoration: InputDecoration(
+                    hint: const Text("Selecione um papel"),
+                    decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.work_outline),
                     ),
                     validator: (value) => (value == null || value.isEmpty)
@@ -146,16 +155,15 @@ class _FormPersonViewState extends State<FormPersonView> {
                       );
                     }).toList(),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   if (_selectedRole != null) ...[
                     // --- 2 BOTÃO ATIVAR/DESATIVAR (SWITCH) ---
                     SwitchListTile(
-                      //cdigo Switch aqui
-                      title: Text('Usuário Ativo?'),
+                      title: const Text('Usuário Ativo?'),
                       value: _isActive,
                       activeColor: Colors.green.shade600,
                       inactiveTrackColor: Colors.grey.shade400,
-                      thumbColor: MaterialStateProperty.all<Color>(
+                      thumbColor: WidgetStateProperty.all<Color>(
                         Colors.white,
                       ),
                       onChanged: (bool value) {
@@ -163,34 +171,31 @@ class _FormPersonViewState extends State<FormPersonView> {
                           _isActive = value;
                         });
                       },
-                      // ...
                     ),
-                    SizedBox(height: 20),
-                    Divider(),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                    const Divider(),
+                    const SizedBox(height: 20),
                     // --- 3 CAMPO NOME COMPLETO ---
                     TextFormField(
                       controller: _nameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Nome Completo",
                         prefixIcon: Icon(Icons.person),
                       ),
-                      validator: (value) => (value == null || value.isEmpty)
+                      textCapitalization: TextCapitalization.words,
+                      validator: (value) => (value == null || value.trim().isEmpty)
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     // Campo para Buscar Propriedades --->>>
                     if (_selectedRole == 'producer') ...[
                       FormField<Property>(
                         validator: (value) {
-                          if (value == null) {
+                          if (_selectedProperty == null) {
                             return 'Selecione uma Propriedade';
                           }
                           return null;
-                        },
-                        onSaved: (value) {
-                          _selectedProperty = value;
                         },
                         builder: (FormFieldState<Property> field) {
                           return TypeAheadField<Property>(
@@ -249,77 +254,89 @@ class _FormPersonViewState extends State<FormPersonView> {
                           );
                         },
                       ),
+                      const SizedBox(height: 16),
                     ],
                     // --- 4 CAMPO CPF/CNPJ ---
                     TextFormField(
                       controller: _cpfCnpjController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "CPF/CNPJ",
                         prefixIcon: Icon(Icons.badge),
+                        hintText: "000.000.000-00",
                       ),
-                      validator: (value) => (value == null || value.isEmpty)
-                          ? 'Campo obrigatório'
-                          : null,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CpfCnpjInputFormatter(),
+                      ],
+                      validator: Validators.validateCpfCnpj,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     if (_selectedRole == 'producer') ...[
                       // ---5 CAMPO CadPro ---
                       TextFormField(
                         controller: _cadproController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: "Cadpro",
                           prefixIcon: Icon(Icons.assignment_ind),
                         ),
-                        validator: (value) => (value == null || value.isEmpty)
+                        validator: (value) => (value == null || value.trim().isEmpty)
                             ? 'Campo obrigatório'
                             : null,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                     ],
                     // --- 6 CAMPO Email ---
                     TextFormField(
                       controller: _emailController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Email",
                         prefixIcon: Icon(Icons.email),
+                        hintText: "exemplo@email.com",
                       ),
-                      validator: (value) => (value == null || value.isEmpty)
-                          ? 'Campo obrigatório'
-                          : null,
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      validator: Validators.validateEmail,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     // --- 7 CAMPO phone ---
                     TextFormField(
                       controller: _phoneController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Telefone",
                         prefixIcon: Icon(Icons.phone),
+                        hintText: "(00) 00000-0000",
                       ),
-                      validator: (value) => (value == null || value.isEmpty)
-                          ? 'Campo obrigatório'
-                          : null,
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        PhoneInputFormatter(),
+                      ],
+                      validator: Validators.validatePhone,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     // --- 8 CAMPO Senha ---
                     TextFormField(
                       controller: _passwordController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Senha",
                         prefixIcon: Icon(Icons.lock),
+                        hintText: "Mínimo 6 caracteres",
                       ),
-                      validator: (value) => (value == null || value.isEmpty)
-                          ? 'Campo obrigatório'
-                          : null,
+                      obscureText: true,
+                      validator: Validators.validatePassword,
                     ),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     // --- BOTÃO DE SUBMISSÃO ---
                     ElevatedButton(
                       // Desabilita o botão enquanto carrega
                       onPressed: isLoading ? null : _submitForm,
-                      child: Text("CADASTRAR", style: TextStyle(fontSize: 16)),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Colors.green[700],
+                        foregroundColor: Colors.white,
                       ),
+                      child: const Text("CADASTRAR", style: TextStyle(fontSize: 16)),
                     ),
                   ],
                 ],
@@ -330,7 +347,7 @@ class _FormPersonViewState extends State<FormPersonView> {
                 Positioned.fill(
                   child: Container(
                     color: Colors.black.withOpacity(0.3),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: const Center(child: CircularProgressIndicator()),
                   ),
                 ),
             ],

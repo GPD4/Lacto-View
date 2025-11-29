@@ -2,21 +2,38 @@
 
 import 'package:flutter/material.dart';
 
+/// Modelo para item de navegação
+class NavItem {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final double iconSize;
+
+  const NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    this.iconSize = 24.0,
+  });
+}
+
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final List<NavItem> items;
 
   const AppBottomNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    required this.items,
   });
 
   @override
   Widget build(BuildContext context) {
     // 1. Precisamos saber o tamanho da tela para calcular a posição da linha
     final screenWidth = MediaQuery.of(context).size.width;
-    const double numItems = 4;
+    final double numItems = items.length.toDouble();
     final double itemWidth = screenWidth / numItems;
     final double indicatorWidth =
         itemWidth * 0.5; // A linha terá 50% da largura do item
@@ -36,28 +53,13 @@ class AppBottomNavBar extends StatelessWidget {
           unselectedFontSize: 12.0,
           // Remove a borda superior padrão para um visual mais limpo
           elevation: 0,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Início',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline, size: 30),
-              activeIcon: Icon(Icons.add_circle, size: 30),
-              label: 'Coletar',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search_outlined),
-              activeIcon: Icon(Icons.search),
-              label: 'Buscar',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Perfil',
-            ),
-          ],
+          items: items
+              .map((item) => BottomNavigationBarItem(
+                    icon: Icon(item.icon, size: item.iconSize),
+                    activeIcon: Icon(item.activeIcon, size: item.iconSize),
+                    label: item.label,
+                  ))
+              .toList(),
         ),
 
         // 2. A linha indicadora animada que fica sobre a barra de navegação
