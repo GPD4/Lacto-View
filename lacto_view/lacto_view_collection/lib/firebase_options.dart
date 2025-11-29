@@ -52,37 +52,38 @@ class DefaultFirebaseOptions {
   //Atualizar o dados abaixo >>>
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBmV-i8jrUknPjaAMHX68u2O2zs6XytvpE',
-    appId: '1:729936702417:android:8e1fc1bc6c0b5d68834ef0',
-    messagingSenderId: '729936702417',
-    projectId: 'lactoview-13e4c',
-    storageBucket: 'lactoview-13e4c.firebasestorage.app',
+    apiKey: "AIzaSyDmAoX1tjLIllIuaO7wGdyIhjV8gpLCTNk",
+    authDomain: "lactoview4.firebaseapp.com",
+    projectId: "lactoview4",
+    storageBucket: "lactoview4.firebasestorage.app",
+    messagingSenderId: "386045070193",
+    appId: "1:386045070193:web:92ed68e837498f509a04d0",
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBVfevg4QTIAc9ptumg3yar3SOrCQbYu5Y',
-    appId: '1:729936702417:ios:f0f9d662109d19f8834ef0',
-    messagingSenderId: '729936702417',
-    projectId: 'lactoview-13e4c',
-    storageBucket: 'lactoview-13e4c.firebasestorage.app',
-    iosBundleId: 'com.example.lactoView',
+    apiKey: "AIzaSyDmAoX1tjLIllIuaO7wGdyIhjV8gpLCTNk",
+    authDomain: "lactoview4.firebaseapp.com",
+    projectId: "lactoview4",
+    storageBucket: "lactoview4.firebasestorage.app",
+    messagingSenderId: "386045070193",
+    appId: "1:386045070193:web:92ed68e837498f509a04d0",
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBVfevg4QTIAc9ptumg3yar3SOrCQbYu5Y',
-    appId: '1:729936702417:ios:f0f9d662109d19f8834ef0',
-    messagingSenderId: '729936702417',
-    projectId: 'lactoview-13e4c',
-    storageBucket: 'lactoview-13e4c.firebasestorage.app',
-    iosBundleId: 'com.example.lactoView',
+  apiKey: "AIzaSyDmAoX1tjLIllIuaO7wGdyIhjV8gpLCTNk",
+    authDomain: "lactoview4.firebaseapp.com",
+    projectId: "lactoview4",
+    storageBucket: "lactoview4.firebasestorage.app",
+    messagingSenderId: "386045070193",
+    appId: "1:386045070193:web:92ed68e837498f509a04d0",
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyA0unhqVSEotLYHGvnW0w-10jQx1MQGtxA',
-    appId: '1:729936702417:web:3488d2580d40525b834ef0',
-    messagingSenderId: '729936702417',
-    projectId: 'lactoview-13e4c',
-    authDomain: 'lactoview-13e4c.firebaseapp.com',
-    storageBucket: 'lactoview-13e4c.firebasestorage.app',
+    apiKey: "AIzaSyDmAoX1tjLIllIuaO7wGdyIhjV8gpLCTNk",
+    authDomain: "lactoview4.firebaseapp.com",
+    projectId: "lactoview4",
+    storageBucket: "lactoview4.firebasestorage.app",
+    messagingSenderId: "386045070193",
+    appId: "1:386045070193:web:92ed68e837498f509a04d0",
   );
 }
