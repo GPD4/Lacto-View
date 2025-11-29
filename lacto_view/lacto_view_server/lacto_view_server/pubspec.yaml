@@ -3,17 +3,19 @@ description: A new Dart Frog application
 version: 1.0.0+1
 publish_to: none
 
-environment:
-  sdk: ">=3.0.0 <4.0.0"
+# As chaves 'environment', 'dependencies', 'dev_dependencies'
+# estão agora em ordem alfabética abaixo.
 
 dependencies:
-  dart_frog: ^1.1.0
-  firebase_admin: ^0.3.1
-  http: ^1.2.0
-  googleapis_auth: 1.6.0
+  dart_frog: ^1.0.0
+  dart_firebase_admin: ^0.4.1
+  crypto: ^3.0.3
 
 dev_dependencies:
   dart_frog_lint: ^0.1.0
+  melos: ^6.1.0
   mocktail: ^1.0.3
   test: ^1.25.5
-  firedart: ^0.9.8
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"

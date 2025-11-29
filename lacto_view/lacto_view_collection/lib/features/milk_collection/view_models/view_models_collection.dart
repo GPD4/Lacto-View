@@ -45,10 +45,6 @@ class MilkCollectionViewModel extends ChangeNotifier {
       notifyListeners();
 
       try {
-        // ==========================================================
-        // CORREÇÃO APLICADA AQUI
-        // Removemos a lista fixa e chamamos o serviço de verdade.
-        // ==========================================================
         _searchResults = await _service.searchProducers(query);
       } catch (e) {
         _searchError = e.toString();

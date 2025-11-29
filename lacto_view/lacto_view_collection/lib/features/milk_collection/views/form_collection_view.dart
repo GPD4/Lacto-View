@@ -133,7 +133,6 @@ class CollectionDataForm extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              // 3. Dropdown com estilo corrigido
               child: DropdownButtonFormField<String>(
                 value: selectedNumtanque,
                 isExpanded: true,
@@ -176,8 +175,6 @@ class CollectionDataForm extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 32),
-
-        // 4. Botões Finais com estilo profissional e consistente
         Row(
           children: [
             Expanded(
