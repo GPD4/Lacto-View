@@ -18,3 +18,5 @@ coverage/
 #API configs json
 routes-controler/lactoview-13e4c-firebase-adminsdk-fbsvc-68e3a9a889.json
 
+# No arquivo .gitignore
+*-firebase-adminsdk-*.json
