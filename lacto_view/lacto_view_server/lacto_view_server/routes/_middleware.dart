@@ -23,8 +23,7 @@ Future<FirebaseAdminApp> _initializeFirebase() async {
 
   const String serviceAccountPath =
       //Caminho do arquivo de serviço Firebase >>>>
-      r'C:\Users\User\Desktop\lacto-view-private\LactoView_Mobile\lacto_view_server\lacto_view_server\lactoview4-firebase-adminsdk-fbsvc-182881e85c.json';
-
+      r'/Users/guilhermebrandaodesouza/Faculdade/4 - Semestre/Integrador/Lacto-View/lacto_view/lacto_view_server/lacto_view_server/lactoview4-firebase-adminsdk-fbsvc-182881e85c.json';
   try {
     final file = File(serviceAccountPath);
     if (!await file.exists()) {
