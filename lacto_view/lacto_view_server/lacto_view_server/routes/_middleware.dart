@@ -67,6 +67,9 @@ Handler middleware(Handler handler) {
         ))
         .use(provider<UserService>(
           (_) => UserService(firestore, auth),
+        ))
+        .use(provider<ProducerService>(
+          (_) => ProducerService(firestore),
         ));
 
     // 👉 TRATAMENTO DE REQUISIÇÕES OPTIONS (CORS PREFLIGHT)
