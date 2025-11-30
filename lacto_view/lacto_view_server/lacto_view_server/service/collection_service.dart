@@ -1,6 +1,5 @@
 import 'package:dart_firebase_admin/firestore.dart';
 import '../model/collection_model.dart';
-import '../model/producer_model.dart';
 import '../service/producer_service.dart';
 
 class CollectionService {
@@ -15,7 +14,7 @@ class CollectionService {
   }
 
   //busca de produtores pelo nome(metodo em producer_service.dart)
-  Future<List<Producer>> searchProducerByName(String name) async {
+  Future<List<ProducerSearchResult>> searchProducerByName(String name) async {
     return await _producerService.searchByName(name);
   }
 
