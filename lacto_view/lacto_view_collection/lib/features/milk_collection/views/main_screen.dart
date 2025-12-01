@@ -3,11 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/nav_bar.dart';
+import '../view_models/navigation_controller.dart';
 import '../../home/view/home_view.dart';
 import '../../profile/view/profile_view.dart';
 import '../../auth/view_model/auth_view_model.dart';
 import '../../auth/model/user_model.dart';
-import 'search_view.dart';
+import '../../search/view/search_collection_view.dart';
 import 'views_collection.dart';
 
 class MainScreen extends StatefulWidget {
@@ -18,7 +19,24 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+  final NavigationController _navigationController = NavigationController();
+
+  @override
+  void initState() {
+    super.initState();
+    _navigationController.addListener(_onNavigationChanged);
+  }
+
+  @override
+  void dispose() {
+    _navigationController.removeListener(_onNavigationChanged);
+    _navigationController.dispose();
+    super.dispose();
+  }
+
+  void _onNavigationChanged() {
+    setState(() {});
+  }
 
   /// Retorna as telas disponíveis baseado na role do usuário
   List<Widget> _getScreensForRole(UserRole role) {
@@ -27,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
         // Producer: Home, Search, Profile
         return const [
           HomeScreen(),
-          SearchScreen(),
+          SearchCollectionView(),
           ProfileScreen(),
         ];
       case UserRole.collector:
@@ -42,7 +60,7 @@ class _MainScreenState extends State<MainScreen> {
         return const [
           HomeScreen(),
           MilkCollectionFormView(),
-          SearchScreen(),
+          SearchCollectionView(),
           ProfileScreen(),
         ];
       default:
@@ -139,33 +157,39 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    _navigationController.navigateTo(index);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthViewModel>(
-      builder: (context, authViewModel, _) {
-        final userRole = authViewModel.currentUser?.role ?? UserRole.user;
-        final screens = _getScreensForRole(userRole);
-        final navItems = _getNavItemsForRole(userRole);
+    return ChangeNotifierProvider<NavigationController>.value(
+      value: _navigationController,
+      child: Consumer<AuthViewModel>(
+        builder: (context, authViewModel, _) {
+          final userRole = authViewModel.currentUser?.role ?? UserRole.user;
+          final screens = _getScreensForRole(userRole);
+          final navItems = _getNavItemsForRole(userRole);
 
-        // Garante que o índice selecionado não exceda o número de telas
-        if (_selectedIndex >= screens.length) {
-          _selectedIndex = 0;
-        }
+          // Garante que o índice selecionado não exceda o número de telas
+          var currentIndex = _navigationController.currentIndex;
+          if (currentIndex >= screens.length) {
+            currentIndex = 0;
+            _navigationController.navigateTo(0);
+          }
 
-        return Scaffold(
-          body: screens[_selectedIndex],
-          bottomNavigationBar: AppBottomNavBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            items: navItems,
-          ),
-        );
-      },
+          return Scaffold(
+            body: IndexedStack(
+              index: currentIndex,
+              children: screens,
+            ),
+            bottomNavigationBar: AppBottomNavBar(
+              currentIndex: currentIndex,
+              onTap: _onItemTapped,
+              items: navItems,
+            ),
+          );
+        },
+      ),
     );
   }
 }
