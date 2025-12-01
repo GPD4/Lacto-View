@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 // 1. IMPORT O SEU FORMULÁRIO REAL
 import '../../profile/view/form_person_view.dart';
 import '../../profile/view/form_property_view.dart';
+import '../../profile/view/person_search_view.dart';
 
 // 2. IMPORTE SEU NOVO WIDGET DE BOTÃO
 import '../../profile/view_model/menu_profile_button.dart'; // <-- Ajuste o caminho se necessário
@@ -114,6 +115,15 @@ class ProfileScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => FormPropertyView()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  ArrowMenuButton(
+                    text: 'Consultar Usuários',
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => PersonSearchView()),
                       );
                     },
                   ),
