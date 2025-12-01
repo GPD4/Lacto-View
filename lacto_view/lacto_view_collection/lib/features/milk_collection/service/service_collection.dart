@@ -1,73 +1,221 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../model/model_collection.dart';
-
-class Producer {
-  final int id;
-  final String name;
-  final String propertyName;
-  Producer({required this.id, required this.name, required this.propertyName});
-}
+import '../model/producer_property_model.dart';
 
 class MilkCollectionService {
-  Future<void> createCollection(MilkCollection collection) async {
+  final String _baseUrl = 'http://localhost:8080';
+
+  /// Cria uma nova coleta no backend
+  Future<MilkCollection> createCollection(
+    String token,
+    MilkCollection collection,
+  ) async {
     print('SALVANDO NOVA COLETA NO BACKEND...');
     print('Dados: ${collection.toJson()}');
-    await Future.delayed(const Duration(seconds: 1));
-    print('Coleta Salva com SUCESSO!');
+
+    try {
+      final uri = Uri.parse('$_baseUrl/collection');
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(collection.toJson()),
+      );
+
+      print('DEBUG MilkCollectionService: Status ${response.statusCode}');
+      print('DEBUG MilkCollectionService: Body ${response.body}');
+
+      if (response.statusCode == 201) {
+        print('Coleta Salva com SUCESSO!');
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        return MilkCollection.fromJson(data);
+      } else {
+        final errorBody = json.decode(response.body);
+        throw Exception(
+          errorBody['error'] ?? 'Erro ao criar coleta: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('Erro no MilkCollectionService.createCollection: $e');
+      rethrow;
+    }
   }
 
-  Future<List<MilkCollection>> getMilkCollections() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return [];
+  /// Busca todas as coletas do backend
+  Future<List<MilkCollection>> getMilkCollections(String token) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/collection');
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print('DEBUG MilkCollectionService.getMilkCollections: Status ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final dynamic decoded = json.decode(response.body);
+
+        if (decoded is List) {
+          final collections = <MilkCollection>[];
+          for (final item in decoded) {
+            try {
+              collections.add(MilkCollection.fromJson(item as Map<String, dynamic>));
+            } catch (e) {
+              print('DEBUG: Erro ao parsear coleta: $e');
+              print('DEBUG: Item problemático: $item');
+            }
+          }
+          return collections;
+        } else {
+          print('DEBUG: Resposta não é uma lista: $decoded');
+          return [];
+        }
+      } else {
+        throw Exception('Erro ao buscar coletas: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro no MilkCollectionService.getMilkCollections: $e');
+      rethrow;
+    }
   }
 
-  Future<void> deleteCollection(int id) async {
-    //Simula uma chamada de rede para deletar os dados
+  /// Deleta uma coleta do backend
+  Future<void> deleteCollection(String token, String id) async {
     print('DELETANDO COLETA COM ID: $id NO BACKEND...');
-    await Future.delayed(const Duration(seconds: 1));
-    print('COLETA DELETADA COM SUCESSO!');
-    //await _dio.delete('http://seu-backend.com/api/collections/$id');
+
+    try {
+      final uri = Uri.parse('$_baseUrl/collection/$id');
+
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        print('COLETA DELETADA COM SUCESSO!');
+      } else {
+        throw Exception('Erro ao deletar coleta: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro no MilkCollectionService.deleteCollection: $e');
+      rethrow;
+    }
   }
 
-  Future<List<Producer>> searchProducers(String query) async {
-    // ... seu código de busca aqui (já está correto) ...
-    print('SERVICE: Buscando produtores com a query: "$query"');
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    final allProducers = [
-      Producer(
-        id: 101,
-        name: 'Zakk Wylde',
-        propertyName: 'Black Label Society',
-      ),
-      Producer(id: 132, name: 'Dimebag Darrell', propertyName: 'Pantera'),
-      Producer(id: 153, name: 'Ozzy Osbourne', propertyName: 'Black Sabbath'),
-      Producer(id: 164, name: 'James HetField', propertyName: 'Metallica'),
-      Producer(id: 135, name: 'Layne Staley', propertyName: 'Alice in Chains'),
-    ];
-
+  /// Busca propriedades por nome ou cidade no backend
+  Future<List<ProducerProperty>> searchProperties(String query) async {
     if (query.isEmpty) {
       return [];
     }
 
-    final lowerCaseQuery = query.toLowerCase();
+    print('SERVICE: Buscando propriedades com a query: "$query"');
 
-    final results = allProducers.where((producer) {
-      final lowerCaseName = producer.name.toLowerCase();
+    try {
+      final uri = Uri.parse('$_baseUrl/property/search').replace(
+        queryParameters: {'q': query},
+      );
 
-      //Logica do Filtro para buscar Producers
-      //1- Verifica se o nome completo começa com a busca
-      final nameStartsWith = lowerCaseName.startsWith(lowerCaseQuery);
-      //2- Quebra o nome em partes e verifica se alguma parte começa com a letra(s) informadas na busca
-      final anyPartStartsWith = lowerCaseName
-          .split(' ')
-          .any((part) => part.startsWith(lowerCaseQuery));
-      //3- Verifica se o ID contém a busca
-      final idContains = producer.id.toString().contains(lowerCaseQuery);
+      print('DEBUG MilkCollectionService.searchProperties: GET $uri');
 
-      return nameStartsWith || anyPartStartsWith || idContains;
-    }).toList();
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
 
-    //Retorna no maximo [5] resultados a fim de não sobrecarregar a tela
-    return results.take(5).toList();
+      print('DEBUG MilkCollectionService.searchProperties: Status ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final dynamic decoded = json.decode(response.body);
+
+        if (decoded is List) {
+          final properties = <ProducerProperty>[];
+          for (final item in decoded) {
+            try {
+              properties.add(ProducerProperty.fromPropertyJson(item as Map<String, dynamic>));
+            } catch (e) {
+              print('DEBUG: Erro ao parsear propriedade: $e');
+              print('DEBUG: Item problemático: $item');
+            }
+          }
+          print('SERVICE: Encontradas ${properties.length} propriedades');
+          return properties;
+        } else {
+          print('DEBUG: Resposta não é uma lista: $decoded');
+          return [];
+        }
+      } else {
+        print('DEBUG: Erro na resposta: ${response.body}');
+        throw Exception('Erro ao buscar propriedades: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro no MilkCollectionService.searchProperties: $e');
+      rethrow;
+    }
+  }
+
+  /// Busca produtores por nome no backend
+  Future<List<ProducerProperty>> searchProducers(String query) async {
+    if (query.isEmpty) {
+      return [];
+    }
+
+    print('SERVICE: Buscando produtores com a query: "$query"');
+
+    try {
+      final uri = Uri.parse('$_baseUrl/producer/search').replace(
+        queryParameters: {'q': query},
+      );
+
+      print('DEBUG MilkCollectionService.searchProducers: GET $uri');
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print('DEBUG MilkCollectionService.searchProducers: Status ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final dynamic decoded = json.decode(response.body);
+
+        if (decoded is List) {
+          final producers = <ProducerProperty>[];
+          for (final item in decoded) {
+            try {
+              producers.add(ProducerProperty.fromProducerJson(item as Map<String, dynamic>));
+            } catch (e) {
+              print('DEBUG: Erro ao parsear produtor: $e');
+              print('DEBUG: Item problemático: $item');
+            }
+          }
+          print('SERVICE: Encontrados ${producers.length} produtores');
+          return producers;
+        } else {
+          print('DEBUG: Resposta não é uma lista: $decoded');
+          return [];
+        }
+      } else {
+        print('DEBUG: Erro na resposta: ${response.body}');
+        throw Exception('Erro ao buscar produtores: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro no MilkCollectionService.searchProducers: $e');
+      rethrow;
+    }
   }
 }
