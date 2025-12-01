@@ -19,6 +19,8 @@ import 'features/auth/service/i_auth_service.dart';
 import 'features/auth/view_model/auth_view_model.dart';
 import 'features/auth/view/login_view.dart';
 
+import 'features/home/service/home_service.dart';
+
 // MODO DE DESENVOLVIMENTO: true = usa dados mockados, false = usa Firebase
 // IMPORTANTE: Devido ao problema de reCAPTCHA em emuladores, use true para desenvolvimento
 const bool USE_MOCK_AUTH = false;
@@ -74,6 +76,9 @@ class MyApp extends StatelessWidget {
                 .read<ServicePropertySearch>(), // <--- Aqui injeta o de BUSCA
           ),
         ),
+
+        // Home providers
+        Provider<HomeService>(create: (_) => HomeService()),
       ],
 
       child: MaterialApp(
